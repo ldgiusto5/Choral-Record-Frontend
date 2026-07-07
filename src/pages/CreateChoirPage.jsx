@@ -71,8 +71,8 @@ const CreateChoirPage = () => {
       toast.success(response.message || 'Coro creado con éxito');
       
       // Redirigir al detalle del coro creado
-      if (response.choir && response.choir.id) {
-        navigate(`/choirs/${response.choir.id}`);
+      if (response.choir && response.choir.name) {
+        navigate(`/choirs/${response.choir.name}`);
       } else {
         navigate('/');
       }

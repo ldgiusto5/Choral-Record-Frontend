@@ -7,7 +7,7 @@ const ChoirCard = ({ choir }) => {
   const eventCount = isMember ? (Number(choir.member_event_count) || 0) : (Number(choir.public_event_count) || 0);
 
   return (
-    <Link to={`/choirs/${choir.id}`} className="photo-card-link">
+    <Link to={`/choirs/${choir.name}`} className="photo-card-link">
       <div className="photo-card card">
 
         <div className="photoWrapper">

@@ -149,7 +149,7 @@ const EventsPage = () => {
                   choirId={event.choir_id}
                   isAdmin={false}
                   showChoirName={true}
-                  onClick={() => navigate(`/choirs/${event.choir_id}`)}
+                  onClick={() => navigate(`/choirs/${event.choir_name}`)}
                 />
               ))}
             </div>

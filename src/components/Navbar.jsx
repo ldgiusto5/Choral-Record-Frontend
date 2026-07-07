@@ -105,7 +105,7 @@ const Navbar = () => {
     setSearchQuery('');
     setIsOpen(false);
     if (item.type === 'choir') {
-      navigate(`/choirs/${item.id}`);
+      navigate(`/choirs/${item.name}`);
     } else {
       navigate(`/profile/${item.username}`);
     }
