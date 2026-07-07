@@ -89,7 +89,7 @@ const EditPiecePage = () => {
         const detectUrl = (val) => {
           if (!val) return 'file';
           const str = String(val);
-          if (str.includes('youtube.com') || str.includes('youtu.be') || !str.includes('/uploads/pieces/')) {
+          if (str.includes('youtube.com') || str.includes('youtu.be')) {
             return 'url';
           }
           return 'file';
