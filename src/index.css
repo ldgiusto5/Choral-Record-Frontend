@@ -3661,3 +3661,56 @@ img {
 .profile-pwd-body.closing {
   animation: lyricsSlideUp 0.15s cubic-bezier(0.4, 0, 0.2, 1) forwards;
 }
+
+/* ===========================================================================
+   MOBILE VIEWPORT AND ALIGNMENT REFINEMENTS
+   =========================================================================== */
+.choir-members-grid {
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: 32px;
+}
+
+@media (max-width: 900px) {
+  .choir-members-grid {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+}
+
+@media (max-width: 600px) {
+  /* Prevent iOS Safari zooming when focusing text inputs */
+  .form-input,
+  .navbar-search-input {
+    font-size: 16px !important;
+  }
+  
+  /* Reduce card paddings on mobile to maximize horizontal screen space */
+  .photo-card, 
+  .profile-edit-card, 
+  .join-requests-card, 
+  .followers-card {
+    padding: 20px !important;
+  }
+
+  /* Adjust grid gap and margins on mobile */
+  .choir-grid, 
+  .user-grid, 
+  .profile-grid-container {
+    gap: 16px !important;
+  }
+
+  /* Make sure the choir detail title doesn't overflow or wrap uglily */
+  .choir-detail-title {
+    font-size: 26px !important;
+  }
+  
+  /* Prevent very long usernames and display names from overflowing */
+  .profile-display-name {
+    font-size: 24px !important;
+    word-break: break-word !important;
+  }
+  .profile-username {
+    word-break: break-word !important;
+  }
+}

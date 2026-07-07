@@ -529,7 +529,7 @@ const ChoirDetailPage = () => {
         <div className="staff-divider" style={{ margin: '20px auto' }}></div>
 
         {/* 3. SECCIÓN DE MIEMBROS Y SOLICITUDES */}
-        <div style={{ display: 'grid', gridTemplateColumns: isAdmin && requests.length > 0 ? '1fr 320px' : '1fr', gap: '32px' }}>
+        <div className={isAdmin && requests.length > 0 ? 'choir-members-grid' : ''} style={!(isAdmin && requests.length > 0) ? { display: 'grid', gridTemplateColumns: '1fr' } : {}}>
           
           <ChoirMembersList members={members} />
 
