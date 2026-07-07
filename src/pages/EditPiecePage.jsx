@@ -228,7 +228,7 @@ const EditPiecePage = () => {
             id={field} 
             accept="audio/*" 
             file={typeof fileVal === 'string' ? null : fileVal} 
-            currentFileUrl={dbFileUrl && dbFileUrl.includes('/uploads/pieces/') ? dbFileUrl : null}
+            currentFileUrl={dbFileUrl || null}
             isDeleted={deleteFlags[flagKey]} 
             labelGhostBase={labelGhost} 
             labelGhostReplace={labelReplace || 'Reemplazar'}

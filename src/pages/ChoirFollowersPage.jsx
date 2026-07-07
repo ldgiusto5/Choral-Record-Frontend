@@ -21,7 +21,7 @@ const ChoirFollowersPage = () => {
 
         // Cargar seguidores
         const followersData = await getChoirFollowers(id);
-        setFollowers(followersData || []);
+        setFollowers(followersData.data || []);
       } catch (err) {
         console.error('Error loading choir followers:', err);
         toast.error('Error al cargar seguidores');
