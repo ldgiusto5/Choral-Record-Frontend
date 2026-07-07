@@ -1,3 +1,5 @@
+import { BACKEND_URL } from '../api/api';
+
 const ChoirJoinRequests = ({ requests, resolvingRequest, onRequestResponse }) => {
   if (!requests || requests.length === 0) return null;
 
@@ -12,7 +14,7 @@ const ChoirJoinRequests = ({ requests, resolvingRequest, onRequestResponse }) =>
           <div key={req.user_id} className="join-request-item">
             <div className="join-request-user-info">
               <div className="user-avatar join-request-avatar">
-                <img className="avatar-img" src={req.profile_image_url || 'http://localhost:3000/assets/default-avatar.png'} alt={req.name} />
+                <img className="avatar-img" src={req.profile_image_url || `${BACKEND_URL}/assets/default-avatar.png`} alt={req.name} />
               </div>
               <div className="join-request-text-col">
                 <h4 className="join-request-name">{req.name}</h4>

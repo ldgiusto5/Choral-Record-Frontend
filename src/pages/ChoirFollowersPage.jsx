@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { getChoirById, getChoirFollowers } from '../api/api';
+import { getChoirById, getChoirFollowers, BACKEND_URL } from '../api/api';
 import Navbar from '../components/Navbar';
 import toast from 'react-hot-toast';
 
@@ -21,10 +21,10 @@ const ChoirFollowersPage = () => {
 
         // Cargar seguidores
         const followersData = await getChoirFollowers(id);
-        setFollowers(followersData.data || []);
-      } catch (error) {
-        console.error('Error al cargar seguidores:', error);
-        toast.error('Error al cargar la lista de seguidores');
+        setFollowers(followersData || []);
+      } catch (err) {
+        console.error('Error loading choir followers:', err);
+        toast.error('Error al cargar seguidores');
       } finally {
         setLoading(false);
       }
@@ -37,9 +37,9 @@ const ChoirFollowersPage = () => {
     return (
       <>
         <Navbar />
-        <main className="main-content text-secondary-center-msg">
-          <p>Cargando seguidores...</p>
-        </main>
+        <div style={{ marginTop: '100px', textAlign: 'center', color: 'var(--text-muted)' }}>
+          Cargando seguidores...
+        </div>
       </>
     );
   }
@@ -48,11 +48,9 @@ const ChoirFollowersPage = () => {
     return (
       <>
         <Navbar />
-        <main className="main-content text-secondary-center-msg">
-          <div className="alert alert-danger">
-            Coro no encontrado.
-          </div>
-        </main>
+        <div style={{ marginTop: '100px', textAlign: 'center', color: 'var(--text-muted)' }}>
+          Coro no encontrado
+        </div>
       </>
     );
   }
@@ -61,10 +59,10 @@ const ChoirFollowersPage = () => {
     <>
       <Navbar />
 
-      <main className="main-content followers-page-main">
+      <main className="profile-page-main">
         
-        {/* Cabecera de Navegación y Título */}
-        <div className="events-header">
+        {/* Enlace de regreso */}
+        <div style={{ textAlign: 'left', marginBottom: '20px' }}>
           <button 
             onClick={() => navigate(`/choirs/${id}`)}
             className="back-link-btn"
@@ -88,7 +86,7 @@ const ChoirFollowersPage = () => {
                     <Link to={`/profile/${follower.username || follower.id}`} className="follower-link">
                       <div className="follower-avatar">
                         <img 
-                          src={follower.profile_image_url || 'http://localhost:3000/assets/default-avatar.png'} 
+                          src={follower.profile_image_url || `${BACKEND_URL}/assets/default-avatar.png`} 
                           alt={follower.name} 
                           className="avatar-img"
                         />

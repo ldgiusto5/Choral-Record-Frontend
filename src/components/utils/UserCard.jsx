@@ -1,10 +1,5 @@
-/**
- * UserCard.jsx
- * Tarjeta de usuario para resultados de búsqueda de usuarios.
- * Uso: <UserCard userItem={userObject} />
- */
-
 import { Link } from 'react-router-dom';
+import { BACKEND_URL } from '../../api/api';
 
 const UserCard = ({ userItem }) => {
   return (
@@ -12,7 +7,7 @@ const UserCard = ({ userItem }) => {
       <div className="photo-card user-card">
         <div className="user-card-avatar">
           <img
-            src={userItem.profile_image_url || 'http://localhost:3000/assets/default-avatar.png'}
+            src={userItem.profile_image_url || `${BACKEND_URL}/assets/default-avatar.png`}
             alt={userItem.name}
             className="avatar-img"
           />

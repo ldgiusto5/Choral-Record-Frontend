@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { getChoirs, searchUsers } from '../api/api';
+import { getChoirs, searchUsers, BACKEND_URL } from '../api/api';
 
 const Navbar = () => {
   const { isAuthenticated, user, token, logout } = useAuth();
@@ -270,7 +270,7 @@ const Navbar = () => {
                 <div className="user-badge">
                   <div className="user-avatar">
                     <img 
-                      src={user.profile_image_url || 'http://localhost:3000/assets/default-avatar.png'} 
+                      src={user.profile_image_url || `${BACKEND_URL}/assets/default-avatar.png`} 
                       alt={user.name} 
                       className="avatar-img" 
                     />

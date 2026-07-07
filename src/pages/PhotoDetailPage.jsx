@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { getPhotoById, deletePhoto } from '../api/api';
+import { getPhotoById, deletePhoto, BACKEND_URL } from '../api/api';
 import { useAuth } from '../context/AuthContext';
 import Navbar from '../components/Navbar';
 import toast from 'react-hot-toast';
@@ -66,7 +66,7 @@ const PhotoDetailPage = () => {
 
   if (!photo) return null;
 
-  const imageUrl = `http://localhost:3000/uploads/photos/${photo.image}`;
+  const imageUrl = `${BACKEND_URL}/uploads/photos/${photo.image}`;
   const isOwner = isAuthenticated && user && user.id === photo.user_id;
   const isAdmin = user.role == "admin";
 

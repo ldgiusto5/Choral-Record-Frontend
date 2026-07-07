@@ -1,8 +1,5 @@
-/**
- * ProfileHeader.jsx
- * Cabecera del perfil de usuario con avatar, información y selector de pestañas.
- */
 import React from 'react';
+import { BACKEND_URL } from '../api/api';
 
 const ProfileHeader = ({
   profileUser,
@@ -16,7 +13,7 @@ const ProfileHeader = ({
       <div className="profile-avatar-container">
         <div className="profile-avatar-circle">
           <img
-            src={currentPreview || 'http://localhost:3000/assets/default-avatar.png'}
+            src={currentPreview || `${BACKEND_URL}/assets/default-avatar.png`}
             alt={profileUser.name}
             className="avatar-img"
           />

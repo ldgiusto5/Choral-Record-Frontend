@@ -10,7 +10,8 @@ import {
   deleteUserProfile, 
   getFollowedChoirs, 
   getExternalUserFollowedChoirs,
-  logoutAllDevices 
+  logoutAllDevices,
+  BACKEND_URL
 } from '../api/api';
 import Navbar from '../components/Navbar';
 import DeleteConfirmationModal from '../components/DeleteConfirmationModal';
@@ -130,7 +131,7 @@ const ProfilePage = () => {
     if (editFile) {
       // Cancelar selección local
       setEditFile(null);
-      setEditPreview(profileUser.profile_image_url || 'http://localhost:3000/assets/default-avatar.png');
+      setEditPreview(profileUser.profile_image_url || `${BACKEND_URL}/assets/default-avatar.png`);
       if (fileInputRef.current) fileInputRef.current.value = '';
       toast.success('Selección de imagen cancelada');
     } else if (profileUser.user_image) {
@@ -140,7 +141,7 @@ const ProfilePage = () => {
         setUpdating(true);
         const response = await deleteProfileImage(profileUser.id, token);
         toast.success(response.message || 'Imagen eliminada');
-        const freshUser = { ...profileUser, user_image: null, profile_image_url: 'http://localhost:3000/assets/default-avatar.png' };
+        const freshUser = { ...profileUser, user_image: null, profile_image_url: `${BACKEND_URL}/assets/default-avatar.png` };
         setProfileUser(freshUser);
         updateUserLocalState(freshUser);
         setEditPreview(freshUser.profile_image_url);
@@ -187,7 +188,7 @@ const ProfilePage = () => {
 
       const freshUser = { ...profileUser, name: editName, username: editUsername, description: editDescription };
       if (response.user?.user_image) {
-        freshUser.profile_image_url = `http://localhost:3000/uploads/profiles/${response.user.user_image}`;
+        freshUser.profile_image_url = `${BACKEND_URL}/uploads/profiles/${response.user.user_image}`;
         freshUser.user_image = response.user.user_image;
       }
       setProfileUser(freshUser);

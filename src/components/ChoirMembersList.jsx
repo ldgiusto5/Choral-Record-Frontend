@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import RoleBadge from './utils/RoleBadge';
+import { BACKEND_URL } from '../api/api';
 
 const ChoirMembersList = ({ members }) => {
   return (
@@ -15,7 +16,7 @@ const ChoirMembersList = ({ members }) => {
               <Link to={`/profile/${member.username || member.user_id}`} className="choir-member-link">
                 <div className="choir-member-avatar">
                   <img 
-                    src={member.profile_image_url || 'http://localhost:3000/assets/default-avatar.png'} 
+                    src={member.profile_image_url || `${BACKEND_URL}/assets/default-avatar.png`} 
                     alt={member.name} 
                     className="avatar-img"
                   />
