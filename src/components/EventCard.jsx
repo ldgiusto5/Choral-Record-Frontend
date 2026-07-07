@@ -28,6 +28,18 @@ const formatDateFull = (dateString) => {
   }
 };
 
+const formatTimeOnly = (dateString) => {
+  if (!dateString) return '';
+  try {
+    const d = new Date(dateString);
+    return d.toLocaleTimeString('es-ES', {
+      hour: '2-digit', minute: '2-digit'
+    });
+  } catch (e) {
+    return '';
+  }
+};
+
 const EventCard = ({ 
   event, 
   choirId, 
@@ -48,55 +60,117 @@ const EventCard = ({
       style={cardStyle}
       onClick={onClick}
     >
-      <div className="event-date-badge">
-        <span className="day">{badge.day}</span>
-        <span className="month">{badge.month}</span>
-      </div>
-      
-      <div className={`event-info-main ${event.image_url ? 'has-image-bg' : ''}`}>
-        <div className="event-title-row">
-          <h4 style={{ margin: 0 }}>{event.title}</h4>
-          
-          <EventStatusTags 
-            isPublic={event.is_public}
-            isVisible={event.is_visible}
-            isCompleted={event.is_completed}
-            isAdmin={isAdmin}
-          />
+      {/* ── MOBILE LAYOUT (Show only on mobile) ── */}
+      <div className="event-card-mobile-layout">
+        <div className="event-mobile-header-row">
+          <div className="event-mobile-time-box">
+            <div className="event-date-badge" style={{ background: 'transparent', width: '40px', height: '40px', border: '1px solid var(--border-hover)', boxShadow: 'none' }}>
+              <span className="day" style={{ fontSize: '1rem', color: 'var(--accent-primary)' }}>{badge.day}</span>
+              <span className="month" style={{ fontSize: '0.55rem', color: 'var(--accent-primary)' }}>{badge.month}</span>
+            </div>
+            <span style={{ fontSize: '12px', fontWeight: '700', color: 'var(--accent-primary)' }}>
+              ⏰ {formatTimeOnly(event.event_date)}
+            </span>
+          </div>
+
+          {/* Attachment button between time and buttons */}
+          {event.info_url && (
+            <div style={{ marginLeft: '6px', marginRight: '6px' }} onClick={(e) => e.stopPropagation()}>
+              <FileLinkButton 
+                url={event.info_url} 
+                icon="📄" 
+                label="Info" 
+              />
+            </div>
+          )}
+
+          <div className="event-mobile-header-actions" onClick={(e) => e.stopPropagation()}>
+            {isAdmin ? (
+              <AdminActionButtons 
+                editPath={`/choirs/${choirId}/events/${event.id}/edit`}
+                onDelete={() => onDelete(event.id)}
+                size="small"
+              />
+            ) : (
+              showChoirName && event.choir_name && (
+                <span className="event-choir-badge-mobile">
+                  🎶 {event.choir_name}
+                </span>
+              )
+            )}
+          </div>
         </div>
-        <p>{event.description || 'Sin descripción adicional.'}</p>
-        <span className="event-time-badge">
-          ⏰ {formatDateFull(event.event_date)}
-        </span>
+
+        <div className="event-mobile-body">
+          <div className={`event-info-main ${event.image_url ? 'has-image-bg' : ''}`} style={{ width: '100%', boxSizing: 'border-box' }}>
+            <div className="event-title-row-mobile">
+              <h4 style={{ margin: 0 }}>{event.title}</h4>
+              <EventStatusTags 
+                isPublic={event.is_public}
+                isVisible={event.is_visible}
+                isCompleted={event.is_completed}
+                isAdmin={isAdmin}
+              />
+            </div>
+            <p className="event-desc-mobile" style={{ marginTop: '6px' }}>{event.description || 'Sin descripción adicional.'}</p>
+          </div>
+        </div>
       </div>
 
-      <div className="event-meta">
-        {showChoirName && event.choir_name && (
-          <span 
-            className="event-choir-badge"
-            title={event.choir_name}
-          >
-            🎶 {event.choir_name}
+      {/* ── DESKTOP LAYOUT (Show only on desktop) ── */}
+      <div className="event-card-desktop-layout">
+        <div className="event-date-badge">
+          <span className="day">{badge.day}</span>
+          <span className="month">{badge.month}</span>
+        </div>
+        
+        <div className={`event-info-main ${event.image_url ? 'has-image-bg' : ''}`}>
+          <div className="event-title-row">
+            <h4 style={{ margin: 0 }}>{event.title}</h4>
+            
+            <EventStatusTags 
+              isPublic={event.is_public}
+              isVisible={event.is_visible}
+              isCompleted={event.is_completed}
+              isAdmin={isAdmin}
+            />
+          </div>
+          <p>{event.description || 'Sin descripción adicional.'}</p>
+          <span className="event-time-badge">
+            ⏰ {formatDateFull(event.event_date)}
           </span>
-        )}
+        </div>
 
-        {event.info_url && (
-          <FileLinkButton 
-            url={event.info_url} 
-            icon="📄" 
-            label="Ver adjunto" 
-            onClick={(e) => e.stopPropagation()}
-          />
+        <div className="event-meta">
+          {showChoirName && event.choir_name && (
+            <span 
+              className="event-choir-badge"
+              title={event.choir_name}
+            >
+              🎶 {event.choir_name}
+            </span>
+          )}
+
+          {event.info_url && (
+            <FileLinkButton 
+              url={event.info_url} 
+              icon="📄" 
+              label="Ver adjunto" 
+              onClick={(e) => e.stopPropagation()}
+            />
+          )}
+        </div>
+
+        {isAdmin && (
+          <div style={{ marginLeft: '12px' }} onClick={(e) => e.stopPropagation()}>
+            <AdminActionButtons 
+              editPath={`/choirs/${choirId}/events/${event.id}/edit`}
+              onDelete={() => onDelete(event.id)}
+              size="medium"
+            />
+          </div>
         )}
       </div>
-
-      {isAdmin && (
-        <AdminActionButtons 
-          editPath={`/choirs/${choirId}/events/${event.id}/edit`}
-          onDelete={() => onDelete(event.id)}
-          size="medium"
-        />
-      )}
     </div>
   );
 };

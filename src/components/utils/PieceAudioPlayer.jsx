@@ -239,7 +239,7 @@ const PieceAudioPlayer = ({ fieldLabel, url, onClose, onPlayStateChange, isExiti
       )}
 
       {/* Unified Custom Controller Layout for BOTH Local & YouTube */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexGrow: 1 }}>
+      <div className="audio-player-controls">
         <button 
           onClick={handlePlayPause}
           type="button"
@@ -257,7 +257,8 @@ const PieceAudioPlayer = ({ fieldLabel, url, onClose, onPlayStateChange, isExiti
             background: 'var(--bg-primary)',
             cursor: 'pointer',
             outline: 'none',
-            boxSizing: 'border-box'
+            boxSizing: 'border-box',
+            flexShrink: 0
           }}
         >
           {isPlaying ? (
@@ -271,7 +272,7 @@ const PieceAudioPlayer = ({ fieldLabel, url, onClose, onPlayStateChange, isExiti
           )}
         </button>
 
-        <span style={{ fontSize: '11px', color: 'var(--text-secondary)', minWidth: '40px' }}>
+        <span style={{ fontSize: '11px', color: 'var(--text-secondary)', minWidth: '35px', textAlign: 'center', flexShrink: 0 }}>
           {formatTime(currentTime)}
         </span>
 
@@ -282,7 +283,8 @@ const PieceAudioPlayer = ({ fieldLabel, url, onClose, onPlayStateChange, isExiti
           value={currentTime} 
           onChange={handleSeek} 
           style={{
-            flexGrow: 1, 
+            flex: '1 1 0%',
+            minWidth: '0px',
             accentColor: 'var(--accent-primary)', 
             cursor: 'pointer',
             height: '4px',
@@ -290,12 +292,12 @@ const PieceAudioPlayer = ({ fieldLabel, url, onClose, onPlayStateChange, isExiti
           }} 
         />
 
-        <span style={{ fontSize: '11px', color: 'var(--text-secondary)', minWidth: '40px' }}>
+        <span style={{ fontSize: '11px', color: 'var(--text-secondary)', minWidth: '35px', textAlign: 'center', flexShrink: 0 }}>
           {formatTime(duration)}
         </span>
 
         {/* Volume Icon + Bar */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+        <div className="audio-player-volume-container">
           <span style={{ fontSize: '12px' }}>🔊</span>
           <input 
             type="range" 
@@ -314,22 +316,7 @@ const PieceAudioPlayer = ({ fieldLabel, url, onClose, onPlayStateChange, isExiti
       </div>
 
       <button 
-        style={{ 
-          padding: 0, 
-          margin: 0,
-          color: 'var(--danger)', 
-          width: '24px',
-          height: '24px',
-          borderRadius: '50%',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          border: '1px solid var(--border-subtle)',
-          background: 'var(--bg-primary)',
-          cursor: 'pointer',
-          outline: 'none',
-          boxSizing: 'border-box'
-        }} 
+        className="audio-player-close-btn"
         onClick={onClose}
         type="button"
       >

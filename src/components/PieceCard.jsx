@@ -100,28 +100,30 @@ const PieceCard = ({
         </div>
         
         {isAdmin && (
-          <AdminActionButtons 
-            editPath={`/choirs/${choirId}/pieces/${piece.id}/edit`}
-            onDelete={() => onDelete(piece.id)}
-            size="small"
-          >
-            <button 
-              className="btn btn-ghost piece-swap-btn" 
-              onClick={(e) => { e.stopPropagation(); onSwapClick(index, 'up'); }} 
-              disabled={index === 0} 
-              title="Subir pieza"
+          <div className="piece-admin-actions">
+            <AdminActionButtons 
+              editPath={`/choirs/${choirId}/pieces/${piece.id}/edit`}
+              onDelete={() => onDelete(piece.id)}
+              size="small"
             >
-              ▲
-            </button>
-            <button 
-              className="btn btn-ghost piece-swap-btn" 
-              onClick={(e) => { e.stopPropagation(); onSwapClick(index, 'down'); }} 
-              disabled={index === totalPieces - 1} 
-              title="Bajar pieza"
-            >
-              ▼
-            </button>
-          </AdminActionButtons>
+              <button 
+                className="btn btn-ghost piece-swap-btn" 
+                onClick={(e) => { e.stopPropagation(); onSwapClick(index, 'up'); }} 
+                disabled={index === 0} 
+                title="Subir pieza"
+              >
+                ▲
+              </button>
+              <button 
+                className="btn btn-ghost piece-swap-btn" 
+                onClick={(e) => { e.stopPropagation(); onSwapClick(index, 'down'); }} 
+                disabled={index === totalPieces - 1} 
+                title="Bajar pieza"
+              >
+                ▼
+              </button>
+            </AdminActionButtons>
+          </div>
         )}
       </div>
 
