@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <defs>
+    <!-- Recorte circular para el favicon -->
+    <clipPath id="circleClip">
+      <circle cx="50" cy="50" r="48" />
+    </clipPath>
+  </defs>
+  <!-- Imagen del logo recortada en círculo -->
+  <image href="logo.png" x="2" y="2" width="96" height="96" clip-path="url(#circleClip)" />
+</svg>

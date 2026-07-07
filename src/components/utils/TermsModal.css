@@ -1,0 +1,119 @@
+/* Stylesheet for TermsModal component */
+
+.terms-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(8px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 10000;
+  padding: 20px;
+}
+
+.terms-modal-container {
+  background: var(--bg-card);
+  border: 1px solid var(--accent-border);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.5);
+  max-width: 750px;
+  width: 100%;
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.terms-modal-header {
+  padding: 20px 24px;
+  background-color: var(--bg-secondary);
+  border-bottom: 2px solid rgba(212, 175, 55, 0.747);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.terms-modal-title {
+  margin: 0;
+  font-size: 20px;
+}
+
+.terms-modal-close-btn {
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 24px;
+  cursor: pointer;
+  padding: 4px;
+  line-height: 1;
+}
+
+.terms-modal-body {
+  padding: 24px;
+  overflow-y: auto;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--text-primary);
+  text-align: left;
+}
+
+.terms-main-title {
+  margin-top: 0;
+  font-size: 16px;
+  color: var(--accent-primary);
+  border-bottom: 2px solid rgba(212, 175, 55, 0.644);
+  padding-bottom: 8px;
+}
+
+.terms-section-title {
+  margin: 16px 0 8px 0;
+  font-size: 15px;
+}
+
+.terms-paragraph {
+  margin: 0 0 16px 0;
+}
+
+.terms-list {
+  margin: 0 0 16px 20px;
+  padding: 0;
+  list-style-type: disc;
+}
+
+.terms-highlight {
+  margin: 12px 0;
+  font-weight: 500;
+}
+
+.terms-modal-footer {
+  padding: 16px 24px;
+  border-top: 2px solid rgba(212, 175, 55, 0.74);
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+/* Scrollbar styling */
+.terms-modal-body::-webkit-scrollbar {
+  width: 8px;
+}
+
+.terms-modal-body::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 4px;
+}
+
+.terms-modal-body::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.35);
+  border-radius: 4px;
+  border: 1.5px solid transparent;
+  background-clip: padding-box;
+}
+
+.terms-modal-body::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(0, 0, 0, 0.5);
+}
