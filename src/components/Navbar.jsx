@@ -1,7 +1,8 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { getChoirs, searchUsers, BACKEND_URL } from '../api/api';
+import { getChoirs, searchUsers, getFollowedChoirs, getFollowedChoirsEvents, BACKEND_URL } from '../api/api';
+import MobileMenu from './MobileMenu';
 
 const Navbar = () => {
   const { isAuthenticated, user, token, logout } = useAuth();
@@ -12,7 +13,34 @@ const Navbar = () => {
   const [choirs, setChoirs] = useState([]);
   const [loading, setLoading] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
+  const [isMobileOpen, setIsMobileOpen] = useState(false);
+  const [eventCount, setEventCount] = useState(0);
   const dropdownRef = useRef(null);
+
+  // Fetch followed choirs events count for navbar notifications
+  useEffect(() => {
+    if (!isAuthenticated || !token) {
+      setEventCount(0);
+      return;
+    }
+
+    const fetchEventCount = async () => {
+      try {
+        const followedRes = await getFollowedChoirs(token);
+        const count = followedRes.data ? followedRes.data.length : 0;
+        if (count > 0) {
+          const res = await getFollowedChoirsEvents(token);
+          setEventCount(res.data ? res.data.length : 0);
+        } else {
+          setEventCount(0);
+        }
+      } catch (err) {
+        console.error('Error fetching event count for navbar:', err);
+      }
+    };
+
+    fetchEventCount();
+  }, [isAuthenticated, token]);
 
   const handleLogout = () => {
     logout();
@@ -120,6 +148,8 @@ const Navbar = () => {
           </span>
           <span className="brand-text">Choral Record</span>
         </Link>
+
+
 
         {/* Buscador Global con Desplegable */}
         <div className="navbar-search" ref={dropdownRef}>
@@ -246,7 +276,7 @@ const Navbar = () => {
         <div className="navbar-actions">
           {isAuthenticated ? (
             <>
-              <Link to="/events" style={{
+              <Link to="/" style={{
                 color: 'var(--text-primary)',
                 fontSize: '14.5px',
                 fontWeight: '600',
@@ -257,7 +287,29 @@ const Navbar = () => {
               onMouseOver={(e) => e.currentTarget.style.color = 'var(--accent-primary)'}
               onMouseOut={(e) => e.currentTarget.style.color = 'var(--text-primary)'}
               >
+                Inicio
+              </Link>
+
+              <Link to="/events" style={{
+                color: 'var(--text-primary)',
+                fontSize: '14.5px',
+                fontWeight: '600',
+                textDecoration: 'none',
+                marginRight: '20px',
+                transition: 'color 0.2s',
+                position: 'relative',
+                display: 'inline-flex',
+                alignItems: 'center'
+              }}
+              onMouseOver={(e) => e.currentTarget.style.color = 'var(--accent-primary)'}
+              onMouseOut={(e) => e.currentTarget.style.color = 'var(--text-primary)'}
+              >
                 Eventos
+                {eventCount > 0 && (
+                  <span className="navbar-event-badge">
+                    {eventCount}
+                  </span>
+                )}
               </Link>
 
               {/* Botón "Crear Coro" redimensionado un 20% más pequeño */}
@@ -285,6 +337,19 @@ const Navbar = () => {
             </>
           ) : (
             <>
+              <Link to="/" style={{
+                color: 'var(--text-primary)',
+                fontSize: '14.5px',
+                fontWeight: '600',
+                textDecoration: 'none',
+                marginRight: '20px',
+                transition: 'color 0.2s'
+              }}
+              onMouseOver={(e) => e.currentTarget.style.color = 'var(--accent-primary)'}
+              onMouseOut={(e) => e.currentTarget.style.color = 'var(--text-primary)'}
+              >
+                Inicio
+              </Link>
               <Link to="/login" className="btn btn-ghost">
                 Iniciar Sesión
               </Link>
@@ -294,7 +359,28 @@ const Navbar = () => {
             </>
           )}
         </div>
+
+        {/* Botón Hamburguesa para Móviles */}
+        <button 
+          className="navbar-hamburger" 
+          onClick={() => setIsMobileOpen(true)}
+          title="Abrir menú"
+        >
+          <span className="hamburger-line"></span>
+          <span className="hamburger-line"></span>
+          <span className="hamburger-line"></span>
+        </button>
       </div>
+
+      <MobileMenu
+        isOpen={isMobileOpen}
+        onClose={() => setIsMobileOpen(false)}
+        isAuthenticated={isAuthenticated}
+        user={user}
+        handleLogout={handleLogout}
+        BACKEND_URL={BACKEND_URL}
+        eventCount={eventCount}
+      />
     </nav>
   );
 };

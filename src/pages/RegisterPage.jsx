@@ -20,6 +20,17 @@ const RegisterPage = () => {
   const [termsRead, setTermsRead] = useState(false);
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [showModal, setShowModal] = useState(false);
+  const [showTooltip, setShowTooltip] = useState(false);
+
+  const handleMouseEnter = () => {
+    if (!termsRead) {
+      setShowTooltip(true);
+    }
+  };
+
+  const handleMouseLeave = () => {
+    setShowTooltip(false);
+  };
 
   const handleAcceptTerms = () => {
     setTermsRead(true);
@@ -162,7 +173,11 @@ const RegisterPage = () => {
               />
             </div>
 
-            <div className="register-terms-row">
+            <div 
+              className="register-terms-row"
+              onMouseEnter={handleMouseEnter}
+              onMouseLeave={handleMouseLeave}
+            >
               <input
                 id="register-terms"
                 type="checkbox"
@@ -187,6 +202,13 @@ const RegisterPage = () => {
                   condiciones de uso
                 </span>
               </label>
+
+              {showTooltip && (
+                <div className="terms-tooltip-bubble">
+                  ⚠️ Debes leer las condiciones de uso haciendo clic en el enlace para poder aceptarlas.
+                  <div className="terms-tooltip-arrow"></div>
+                </div>
+              )}
             </div>
 
             <button

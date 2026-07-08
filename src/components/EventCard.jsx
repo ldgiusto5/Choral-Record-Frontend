@@ -142,15 +142,6 @@ const EventCard = ({
         </div>
 
         <div className="event-meta">
-          {showChoirName && event.choir_name && (
-            <span 
-              className="event-choir-badge"
-              title={event.choir_name}
-            >
-              🎶 {event.choir_name}
-            </span>
-          )}
-
           {event.info_url && (
             <FileLinkButton 
               url={event.info_url} 
@@ -158,6 +149,15 @@ const EventCard = ({
               label="Ver adjunto" 
               onClick={(e) => e.stopPropagation()}
             />
+          )}
+
+          {showChoirName && event.choir_name && (
+            <span 
+              className="event-choir-badge"
+              title={event.choir_name}
+            >
+              🎶 {event.choir_name}
+            </span>
           )}
         </div>
 

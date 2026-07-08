@@ -45,18 +45,20 @@ export const AuthProvider = ({ children }) => {
           const refreshData = await refreshSession(savedRefreshToken);
           
           const isLocal = !!localStorage.getItem('refreshToken');
+          const fullUser = await getMyProfile(refreshData.token);
+          
           if (isLocal) {
             localStorage.setItem('token', refreshData.token);
             localStorage.setItem('refreshToken', refreshData.refreshToken);
-            localStorage.setItem('user', JSON.stringify(refreshData.user));
+            localStorage.setItem('user', JSON.stringify(fullUser));
           } else {
             sessionStorage.setItem('token', refreshData.token);
             sessionStorage.setItem('refreshToken', refreshData.refreshToken);
-            sessionStorage.setItem('user', JSON.stringify(refreshData.user));
+            sessionStorage.setItem('user', JSON.stringify(fullUser));
           }
           
           setToken(refreshData.token);
-          setUser(refreshData.user);
+          setUser(fullUser);
         } catch (error) {
           console.error('Session restore via refresh token failed:', error);
           logout();
