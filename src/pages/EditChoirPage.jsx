@@ -6,6 +6,7 @@ import {
   getChoirMembers,
   updateChoir,
   updateMemberRole,
+  removeChoirMember,
 } from '../api/api';
 import Navbar from '../components/Navbar';
 import toast from 'react-hot-toast';
@@ -99,7 +100,7 @@ const ToggleSwitch = ({ checked, onChange, disabled }) => (
 /* ─── Main Page ─────────────────────────────────────────────────────────── */
 const EditChoirPage = () => {
   const { id } = useParams();
-  const { token } = useAuth();
+  const { token, user } = useAuth();
   const navigate = useNavigate();
 
   // ── Choir data
@@ -121,6 +122,7 @@ const EditChoirPage = () => {
   // ── Confirm demote modal
   const [confirmMember, setConfirmMember] = useState(null); // { userId, name }
   const [togglingId, setTogglingId]       = useState(null);
+  const [expellingId, setExpellingId]     = useState(null);
 
   /* ── Load data ──────────────────────────────────────────────────────── */
   const loadData = useCallback(async () => {
@@ -233,6 +235,25 @@ const EditChoirPage = () => {
       toast.error(err.message || 'Error al cambiar el rol');
     } finally {
       setTogglingId(null);
+    }
+  };
+
+  /* ── Expel member ────────────────────────────────────────────────────── */
+  const handleExpelMember = async (member) => {
+    const memberName = member.name || member.username;
+    if (!window.confirm(`¿Realmente quieres expulsar a "${memberName}" del coro?`)) {
+      return;
+    }
+
+    setExpellingId(member.user_id);
+    try {
+      await removeChoirMember(id, member.user_id, token);
+      setMembers(prev => prev.filter(m => m.user_id !== member.user_id));
+      toast.success('❌ Miembro expulsado del coro correctamente');
+    } catch (err) {
+      toast.error(err.message || 'Error al expulsar al miembro');
+    } finally {
+      setExpellingId(null);
     }
   };
 
@@ -517,6 +538,46 @@ const EditChoirPage = () => {
                     {isToggling && (
                       <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>...</span>
                     )}
+                    {!isCurrentUserSelf && String(member.user_id) !== String(user?.id) && (
+                      <button
+                        type="button"
+                        style={{
+                          background: 'none',
+                          border: '1px solid var(--danger)',
+                          borderRadius: 'var(--radius-sm)',
+                          color: 'var(--danger)',
+                          fontSize: '12px',
+                          fontWeight: '600',
+                          padding: '5px 10px',
+                          cursor: 'pointer',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '4px',
+                          transition: 'all 0.2s ease',
+                          marginRight: '10px'
+                        }}
+                        onMouseOver={(e) => {
+                          e.currentTarget.style.background = 'var(--danger)';
+                          e.currentTarget.style.color = '#ffffff';
+                        }}
+                        onMouseOut={(e) => {
+                          e.currentTarget.style.background = 'none';
+                          e.currentTarget.style.color = 'var(--danger)';
+                        }}
+                        onClick={() => handleExpelMember(member)}
+                        disabled={expellingId === member.user_id}
+                      >
+                        {expellingId === member.user_id ? (
+                          'Expulsando...'
+                        ) : (
+                          <>
+                            <span className="expel-text-mobile">Expulsar</span>
+                            <span className="expel-text-desktop">Expulsar miembro</span>
+                          </>
+                        )}
+                      </button>
+                    )}
+
                     <ToggleSwitch
                       checked={isAdmin}
                       onChange={() => handleToggleRole(member)}

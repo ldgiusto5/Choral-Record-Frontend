@@ -4257,3 +4257,20 @@ img {
   word-wrap: break-word !important;
   word-break: break-word !important;
 }
+
+/* Responsive Expel Member button labels */
+.expel-text-desktop {
+  display: inline !important;
+}
+.expel-text-mobile {
+  display: none !important;
+}
+
+@media (max-width: 768px) {
+  .expel-text-desktop {
+    display: none !important;
+  }
+  .expel-text-mobile {
+    display: inline !important;
+  }
+}
