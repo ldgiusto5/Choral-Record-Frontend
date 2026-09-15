@@ -13,6 +13,7 @@ const PieceCard = ({
   totalPieces,
   choirId, 
   isAdmin,
+  isHideMode = false,
   draggedPieceId,
   dragOverPieceId,
   activeAudio,
@@ -25,6 +26,7 @@ const PieceCard = ({
   onDragEnd,
   onSwapClick,
   onDelete,
+  onToggleVisibility,
   onPlayAudio,
   onToggleLyrics,
   onCloseAudio,
@@ -59,7 +61,7 @@ const PieceCard = ({
     >
       <div className="piece-bar-header">
         <div className="piece-title-section">
-          {isAdmin && (
+          {isAdmin && !isHideMode && (
             <div 
               className="drag-handle" 
               title="Arrastra para reordenar"
@@ -79,7 +81,9 @@ const PieceCard = ({
             className="piece-title-interactive"
             onClick={() => setIsExpanded(!isExpanded)}
           >
-            <span className="piece-icon">{isHidden ? '👁️‍🗨' : '🎼'}</span>
+            <span className="piece-icon" key={isHidden ? 'hidden' : 'visible'}>
+              {isHidden ? '👁️‍🗨' : '🎼'}
+            </span>
             <h3>
               {index + 1}. {piece.name}
               <span className={`piece-expand-arrow ${isExpanded ? 'expanded' : ''}`}>
@@ -91,7 +95,7 @@ const PieceCard = ({
                 </span>
               )}
               {isHidden && (
-                <span className="piece-invisible-badge" style={{ marginLeft: '8px', background: 'var(--text-muted)', color: 'var(--bg-primary)' }}>
+                <span className="piece-invisible-badge">
                   Oculto
                 </span>
               )}
@@ -101,28 +105,56 @@ const PieceCard = ({
         
         {isAdmin && (
           <div className="piece-admin-actions">
-            <AdminActionButtons 
-              editPath={`/choirs/${choirId}/pieces/${piece.id}/edit`}
-              onDelete={() => onDelete(piece.id)}
-              size="small"
-            >
-              <button 
-                className="btn btn-ghost piece-swap-btn" 
-                onClick={(e) => { e.stopPropagation(); onSwapClick(index, 'up'); }} 
-                disabled={index === 0} 
-                title="Subir pieza"
+            {isHideMode ? (
+              <button
+                type="button"
+                className={`piece-visibility-btn ${isHidden ? 'is-hidden' : 'is-visible'}`}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  if (onToggleVisibility) onToggleVisibility(piece.id);
+                }}
+                title={isHidden ? "Hacer partitura visible" : "Ocultar partitura"}
               >
-                ▲
+                <span className="piece-visibility-icon">
+                  {isHidden ? (
+                    // Ojo cerrado (tachado)
+                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" />
+                      <line x1="1" y1="1" x2="23" y2="23" />
+                    </svg>
+                  ) : (
+                    // Ojo abierto
+                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                      <circle cx="12" cy="12" r="3" />
+                    </svg>
+                  )}
+                </span>
               </button>
-              <button 
-                className="btn btn-ghost piece-swap-btn" 
-                onClick={(e) => { e.stopPropagation(); onSwapClick(index, 'down'); }} 
-                disabled={index === totalPieces - 1} 
-                title="Bajar pieza"
+            ) : (
+              <AdminActionButtons 
+                editPath={`/choirs/${choirId}/pieces/${piece.id}/edit`}
+                onDelete={() => onDelete(piece.id)}
+                size="small"
               >
-                ▼
-              </button>
-            </AdminActionButtons>
+                <button 
+                  className="btn btn-ghost piece-swap-btn" 
+                  onClick={(e) => { e.stopPropagation(); onSwapClick(index, 'up'); }} 
+                  disabled={index === 0} 
+                  title="Subir pieza"
+                >
+                  ▲
+                </button>
+                <button 
+                  className="btn btn-ghost piece-swap-btn" 
+                  onClick={(e) => { e.stopPropagation(); onSwapClick(index, 'down'); }} 
+                  disabled={index === totalPieces - 1} 
+                  title="Bajar pieza"
+                >
+                  ▼
+                </button>
+              </AdminActionButtons>
+            )}
           </div>
         )}
       </div>

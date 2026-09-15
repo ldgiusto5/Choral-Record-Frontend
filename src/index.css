@@ -4274,3 +4274,158 @@ img {
     display: inline !important;
   }
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   PIECE VISIBILITY TOGGLE (VISIBILIDAD / EDITAR) & ANIMATIONS
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Contenedores de sección de partituras */
+.pieces-section {
+  margin-bottom: 24px;
+  text-align: left;
+}
+
+.piece-section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.piece-section-header .section-title {
+  margin: 0;
+}
+
+.piece-header-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.piece-add-btn {
+  padding: 8px 16px;
+  font-size: 14px;
+}
+
+.pieces-list-container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Botón Visibilidad / Editar en cabecera de Repertorio */
+.piece-mode-toggle-btn {
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 600;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.piece-mode-toggle-btn.mode-edit-active {
+  box-shadow: 0 0 0 2px var(--bg-primary), 0 0 0 4px var(--accent-primary) !important;
+  filter: brightness(1.12);
+  transform: translateY(-1px);
+}
+
+/* Botón redondo de visibilidad (Ojo abierto / Ojo cerrado) */
+.piece-visibility-btn {
+  width: 32px;
+  height: 32px;
+  min-width: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px;
+  cursor: pointer;
+  border: 1px solid var(--border-subtle);
+  background: transparent;
+  color: var(--text-secondary);
+  transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+  animation: pieceButtonPopIn 0.28s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+.piece-visibility-btn:hover {
+  background: var(--accent-glow) !important;
+  border-color: var(--accent-primary) !important;
+  color: var(--accent-primary) !important;
+  transform: scale(1.12);
+}
+
+.piece-visibility-btn:active {
+  transform: scale(0.9);
+}
+
+.piece-visibility-btn.is-hidden {
+  color: var(--text-muted);
+  border-style: dashed;
+}
+
+.piece-visibility-btn.is-hidden:hover {
+  color: var(--accent-primary);
+  border-style: solid;
+}
+
+.piece-visibility-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.piece-visibility-btn:hover .piece-visibility-icon {
+  transform: scale(1.1);
+}
+
+/* Animación de entrada de botón */
+@keyframes pieceButtonPopIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Animación de pop para la etiqueta de Oculto */
+@keyframes pieceBadgePopIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.7);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.piece-invisible-badge {
+  color: var(--bg-primary);
+  background: var(--text-muted);
+  margin-left: 8px;
+  font-size: 12px;
+  font-weight: bold;
+  padding: 2px 8px;
+  border-radius: 4px;
+  display: inline-flex;
+  align-items: center;
+  animation: pieceBadgePopIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+/* Transición suave para el icono del título */
+.piece-icon {
+  font-size: 1.3rem;
+  color: var(--accent-primary);
+  display: inline-block;
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.25s ease;
+}
+
+

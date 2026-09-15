@@ -12,6 +12,7 @@ import {
   getChoirPieces,
   deleteChoirEvent,
   deleteChoirPiece,
+  updateChoirPiece,
   swapPieces,
   deleteChoir,
   removeChoirMember,
@@ -54,6 +55,9 @@ const ChoirDetailPage = () => {
   // Reordenar piezas (Drag & Drop)
   const [draggedPieceId, setDraggedPieceId] = useState(null);
   const [dragOverPieceId, setDragOverPieceId] = useState(null);
+
+  // Modo Ocultar / Editar piezas
+  const [isHideMode, setIsHideMode] = useState(false);
 
   // Estados para eliminación de coro
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -280,6 +284,28 @@ const ChoirDetailPage = () => {
     }
   };
 
+  const handleTogglePieceVisibility = async (pieceId) => {
+    const piece = pieces.find(p => p.id === pieceId);
+    if (!piece) return;
+
+    const currentVisible = piece.is_visible !== false && piece.is_visible !== 0 && piece.is_visible !== 'false';
+    const newVisible = !currentVisible;
+
+    // Actualización optimista inmediata en la UI
+    setPieces(prev => prev.map(p => p.id === pieceId ? { ...p, is_visible: newVisible } : p));
+
+    try {
+      const formData = new FormData();
+      formData.append('is_visible', newVisible ? 'true' : 'false');
+      await updateChoirPiece(id, pieceId, formData, token);
+      toast.success(newVisible ? 'Partitura ahora visible' : 'Partitura oculta');
+    } catch (error) {
+      // Revertir estado si falla la petición
+      setPieces(prev => prev.map(p => p.id === pieceId ? { ...p, is_visible: currentVisible } : p));
+      toast.error(error.message || 'Error al cambiar visibilidad');
+    }
+  };
+
   const swapLocalPieces = (idA, idB) => {
     setPieces(prev => {
       const next = [...prev];
@@ -474,18 +500,32 @@ const ChoirDetailPage = () => {
 
         {/* 2. SECCIÓN DE PARTITURAS */}
         {isMember ? (
-          <section style={{ marginBottom: '24px', textAlign: 'left' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
-              <h2 className="section-title" style={{ margin: 0 }}>📂 Repertorio Musical</h2>
+          <section className="pieces-section">
+            <div className="piece-section-header">
+              <h2 className="section-title">📂 Repertorio Musical</h2>
               {isAdmin && (
-                <button className="btn btn-accent" onClick={() => navigate(`/choirs/${id}/pieces/add`)} style={{ padding: '8px 16px', fontSize: '14px' }}>
-                  + Añadir Pieza
-                </button>
+                <div className="piece-header-actions">
+                  <button 
+                    type="button"
+                    className={`btn btn-accent piece-mode-toggle-btn ${isHideMode ? 'mode-edit-active' : ''}`}
+                    onClick={() => setIsHideMode(!isHideMode)}
+                    title={isHideMode ? 'Volver al modo edición' : 'Modo para ocultar o mostrar partituras'}
+                  >
+                    {isHideMode ? 'Editar' : 'Visibilidad'}
+                  </button>
+                  <button 
+                    type="button"
+                    className="btn btn-accent piece-add-btn" 
+                    onClick={() => navigate(`/choirs/${id}/pieces/add`)}
+                  >
+                    + Añadir Pieza
+                  </button>
+                </div>
               )}
             </div>
 
             {pieces.length > 0 ? (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              <div className="pieces-list-container">
                 {pieces.map((piece, idx) => (
                   <PieceCard 
                     key={piece.id}
@@ -494,6 +534,7 @@ const ChoirDetailPage = () => {
                     totalPieces={pieces.length}
                     choirId={id}
                     isAdmin={isAdmin}
+                    isHideMode={isHideMode}
                     draggedPieceId={draggedPieceId}
                     dragOverPieceId={dragOverPieceId}
                     activeAudio={activeAudio}
@@ -506,6 +547,7 @@ const ChoirDetailPage = () => {
                     onDragEnd={handleDragEnd}
                     onSwapClick={handleSwapClick}
                     onDelete={handleDeletePiece}
+                    onToggleVisibility={handleTogglePieceVisibility}
                     onPlayAudio={playAudio}
                     onToggleLyrics={toggleLyrics}
                     onCloseAudio={closeAudio}
