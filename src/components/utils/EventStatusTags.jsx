@@ -1,22 +1,24 @@
 const EventStatusTags = ({ isPublic, isVisible, isCompleted, isAdmin }) => {
+  if (!isPublic && (isVisible || !isAdmin) && !isCompleted) return null;
+
   return (
-    <>
+    <div className="event-status-tags-wrapper">
       {isPublic && (
-        <span style={{ fontSize: '11px', background: 'rgba(212, 175, 55, 0.12)', color: 'var(--accent-primary)', padding: '2px 6px', borderRadius: '4px', border: '1px solid rgba(212,175,55,0.3)' }}>
+        <span className="event-status-tag event-status-tag-public">
           🌍 Público
         </span>
       )}
       {!isVisible && isAdmin && (
-        <span style={{ fontSize: '11px', background: 'var(--bg-secondary)', color: 'var(--text-muted)', padding: '2px 6px', borderRadius: '4px', border: '1px solid var(--border-subtle)' }}>
+        <span className="event-status-tag event-status-tag-hidden">
           Oculto para miembros
         </span>
       )}
       {isCompleted && (
-        <span style={{ fontSize: '11px', background: 'rgba(6, 182, 212, 0.12)', color: 'var(--accent-secondary)', padding: '2px 6px', borderRadius: '4px', border: '1px solid rgba(6, 182, 212, 0.2)' }}>
+        <span className="event-status-tag event-status-tag-completed">
           Completado
         </span>
       )}
-    </>
+    </div>
   );
 };
 

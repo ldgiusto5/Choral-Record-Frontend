@@ -420,7 +420,7 @@ const ChoirDetailPage = () => {
     <>
       <Navbar />
 
-      <main className="main-content" style={{ padding: '0 24px', maxWidth: '1000px', margin: '24px auto 60px auto' }}>
+      <main className="main-content choir-detail-main">
         
         {/* CABECERA */}
         <ChoirHeader 
@@ -442,11 +442,11 @@ const ChoirDetailPage = () => {
 
         {/* 1. SECCIÓN DE EVENTOS */}
         {isMember ? (
-          <section style={{ marginBottom: '24px', textAlign: 'left' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
-              <h2 className="section-title" style={{ margin: 0 }}>📅 Calendario de Eventos</h2>
+          <section className="events-section">
+            <div className="events-section-header">
+              <h2 className="section-title">📅 Calendario de Eventos</h2>
               {isAdmin && (
-                <button className="btn btn-accent" onClick={() => navigate(`/choirs/${id}/events/add`)} style={{ padding: '8px 16px', fontSize: '14px' }}>
+                <button className="btn btn-accent events-add-btn" onClick={() => navigate(`/choirs/${id}/events/add`)}>
                   + Programar Evento
                 </button>
               )}
@@ -471,9 +471,9 @@ const ChoirDetailPage = () => {
             )}
           </section>
         ) : publicEvents.length > 0 ? (
-          <section style={{ marginBottom: '24px', textAlign: 'left' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
-              <h2 className="section-title" style={{ margin: 0 }}>📅 Próximos Eventos Públicos</h2>
+          <section className="events-section">
+            <div className="events-section-header">
+              <h2 className="section-title">📅 Próximos Eventos Públicos</h2>
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
               {publicEvents.map(event => (
@@ -587,20 +587,10 @@ const ChoirDetailPage = () => {
 
         {/* Botones de membresía (Salir/Eliminar Coro) */}
         {isAuthenticated && isMember && (
-          <div style={{ marginTop: '48px', display: 'flex', flexDirection: 'column', gap: '16px', alignItems: 'flex-start' }}>
+          <div className="choir-detail-danger-actions">
             {members.length > 1 && (
               <button 
-                className="btn" 
-                style={{ 
-                  background: 'transparent', 
-                  color: 'var(--danger)', 
-                  border: '1px solid var(--danger)', 
-                  padding: '10px 24px', 
-                  fontSize: '14px', 
-                  borderRadius: 'var(--radius-md)', 
-                  fontWeight: '600', 
-                  cursor: 'pointer' 
-                }}
+                className="btn btn-leave-choir" 
                 onClick={handleLeaveChoir}
                 disabled={leaving}
               >
@@ -610,17 +600,7 @@ const ChoirDetailPage = () => {
 
             {isAdmin && (
               <button 
-                className="btn" 
-                style={{ 
-                  background: 'var(--danger)', 
-                  color: '#ffffff', 
-                  padding: '10px 24px', 
-                  fontSize: '14px', 
-                  border: 'none', 
-                  borderRadius: 'var(--radius-md)', 
-                  fontWeight: '600', 
-                  cursor: 'pointer' 
-                }}
+                className="btn btn-delete-choir" 
                 onClick={() => setShowDeleteModal(true)}
               >
                 Eliminar Coro

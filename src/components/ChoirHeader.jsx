@@ -45,7 +45,9 @@ const ChoirHeader = ({
                 title="Ver lista de seguidores"
                 style={{ padding: '3px 8px', fontSize: '10px', margin: 0, gap: '4px' }}
               >
-                💜 <strong style={{ marginLeft: '1px', marginRight: '1px' }}>{followersCount}</strong> {followersCount === 1 ? 'seguidor' : 'seguidores'}
+                <span>💜</span>
+                <strong>{followersCount}</strong>
+                <span>{followersCount === 1 ? 'seguidor' : 'seguidores'}</span>
               </button>
             </div>
           </div>
@@ -60,12 +62,14 @@ const ChoirHeader = ({
         <div className="choir-mobile-meta-row">
           {(choir.place || choir.country) && (
             <div className="choir-header-location-mobile">
-              📍 {[choir.place, choir.country].filter(Boolean).join(', ')}
+              <span>📍</span>
+              <span>{[choir.place, choir.country].filter(Boolean).join(', ')}</span>
             </div>
           )}
 
           <div className="choir-header-creator-mobile">
-            Creado por: <strong>{choir.owner || choir.creator_name}</strong>
+            <span>Creado por:</span>
+            <strong>{choir.owner || choir.creator_name}</strong>
           </div>
         </div>
 
@@ -201,18 +205,22 @@ const ChoirHeader = ({
           <div className="choir-instagram-row2">
             {(choir.place || choir.country) && (
               <span className="choir-stat-item">
-                📍 {[choir.place, choir.country].filter(Boolean).join(', ')}
+                <span className="choir-stat-icon">📍</span>
+                <span>{[choir.place, choir.country].filter(Boolean).join(', ')}</span>
               </span>
             )}
             <span className="choir-stat-item">
-              Creado por: <strong>{choir.owner || choir.creator_name}</strong>
+              <span>Creado por:</span>
+              <strong>{choir.owner || choir.creator_name}</strong>
             </span>
             <button
               onClick={() => navigate(`/choirs/${choirId}/followers`)}
               className="choir-stat-item-btn"
               title="Ver lista de seguidores"
             >
-              💜 <strong>{followersCount}</strong> {followersCount === 1 ? 'seguidor' : 'seguidores'}
+              <span className="choir-stat-icon">💜</span>
+              <strong>{followersCount}</strong>
+              <span>{followersCount === 1 ? 'seguidor' : 'seguidores'}</span>
             </button>
           </div>
 
