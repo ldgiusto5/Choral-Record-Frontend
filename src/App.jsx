@@ -15,6 +15,7 @@ import EditEventPage from './pages/EditEventPage';
 import ChoirFollowersPage from './pages/ChoirFollowersPage';
 import EventsPage from './pages/EventsPage';
 import VerifyEmailPage from './pages/VerifyEmailPage';
+import GuessNotePage from './pages/GuessNotePage';
 import Footer from './components/Footer';
 import './App.css';
 
@@ -38,6 +39,8 @@ function AppContent() {
         <Route path="/choirs/:id/pieces/:pieceId/edit" element={<EditPiecePage />} />
         <Route path="/choirs/:id/events/:eventId/edit" element={<EditEventPage />} />
         <Route path="/events" element={<EventsPage />} />
+        <Route path="/games/guess-note" element={<GuessNotePage />} />
+        <Route path="/games" element={<GuessNotePage />} />
         <Route path="/verify-email" element={<VerifyEmailPage />} />
       </Routes>
       {!hideFooter && <Footer />}

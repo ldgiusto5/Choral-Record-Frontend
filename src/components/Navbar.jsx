@@ -15,7 +15,20 @@ const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [eventCount, setEventCount] = useState(0);
+  const [gamesDropdownOpen, setGamesDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
+  const gamesDropdownRef = useRef(null);
+
+  // Close games dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutsideGames = (e) => {
+      if (gamesDropdownRef.current && !gamesDropdownRef.current.contains(e.target)) {
+        setGamesDropdownOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutsideGames);
+    return () => document.removeEventListener('mousedown', handleClickOutsideGames);
+  }, []);
 
   // Fetch followed choirs events count for navbar notifications
   useEffect(() => {
@@ -312,6 +325,36 @@ const Navbar = () => {
                 )}
               </Link>
 
+              {/* Menú Desplegable Juegos */}
+              <div 
+                className="navbar-games-dropdown-container" 
+                ref={gamesDropdownRef}
+              >
+                <button 
+                  className="navbar-games-trigger-btn"
+                  onClick={() => setGamesDropdownOpen(!gamesDropdownOpen)}
+                  type="button"
+                  aria-expanded={gamesDropdownOpen}
+                >
+                  Juegos <span className="dropdown-arrow-icon">▾</span>
+                </button>
+                {gamesDropdownOpen && (
+                  <div className="navbar-games-dropdown-menu">
+                    <Link 
+                      to="/games/guess-note" 
+                      className="navbar-games-dropdown-item"
+                      onClick={() => setGamesDropdownOpen(false)}
+                    >
+                      <span className="game-item-icon">🎵</span>
+                      <div className="game-item-info">
+                        <span className="game-item-title">Guess Note</span>
+                        <span className="game-item-desc">Adivina la nota de piano diaria</span>
+                      </div>
+                    </Link>
+                  </div>
+                )}
+              </div>
+
               {/* Botón "Crear Coro" redimensionado un 20% más pequeño */}
               <Link to="/choirs/create" className="btn btn-accent" style={{ padding: '8px 14px', fontSize: '13.5px' }}>
                 <span className="btn-icon" style={{ fontSize: '12px' }}>+</span>
@@ -350,6 +393,37 @@ const Navbar = () => {
               >
                 Inicio
               </Link>
+
+              {/* Menú Desplegable Juegos para visitantes */}
+              <div 
+                className="navbar-games-dropdown-container" 
+                ref={gamesDropdownRef}
+              >
+                <button 
+                  className="navbar-games-trigger-btn"
+                  onClick={() => setGamesDropdownOpen(!gamesDropdownOpen)}
+                  type="button"
+                  aria-expanded={gamesDropdownOpen}
+                >
+                  Juegos <span className="dropdown-arrow-icon">▾</span>
+                </button>
+                {gamesDropdownOpen && (
+                  <div className="navbar-games-dropdown-menu">
+                    <Link 
+                      to="/games/guess-note" 
+                      className="navbar-games-dropdown-item"
+                      onClick={() => setGamesDropdownOpen(false)}
+                    >
+                      <span className="game-item-icon">🎵</span>
+                      <div className="game-item-info">
+                        <span className="game-item-title">Guess Note</span>
+                        <span className="game-item-desc">Adivina la nota de piano diaria</span>
+                      </div>
+                    </Link>
+                  </div>
+                )}
+              </div>
+
               <Link to="/login" className="btn btn-ghost">
                 Iniciar Sesión
               </Link>

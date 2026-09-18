@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import './MobileMenu.css';
 
@@ -10,6 +11,8 @@ const MobileMenu = ({
   BACKEND_URL,
   eventCount
 }) => {
+  const [isGamesExpanded, setIsGamesExpanded] = useState(false);
+
   if (!isOpen) return null;
 
   return (
@@ -42,9 +45,37 @@ const MobileMenu = ({
             Inicio
           </Link>
 
+          {/* Pestaña desplegable de Juegos en Mobile */}
+          <div className="mobile-menu-games-accordion">
+            <button 
+              type="button" 
+              className="mobile-menu-item-text mobile-menu-games-trigger" 
+              onClick={() => setIsGamesExpanded(!isGamesExpanded)}
+            >
+              <span>Juegos</span>
+              <span className={`mobile-games-arrow ${isGamesExpanded ? 'open' : ''}`}>▾</span>
+            </button>
+
+            {isGamesExpanded && (
+              <div className="mobile-menu-games-sublist">
+                <Link 
+                  to="/games/guess-note" 
+                  className="mobile-menu-subitem-link" 
+                  onClick={onClose}
+                >
+                  <span className="game-subitem-icon">🎵</span>
+                  <div className="game-subitem-info">
+                    <span className="game-subitem-title">Guess Note</span>
+                    <span className="game-subitem-desc">Adivina la nota de piano diaria</span>
+                  </div>
+                </Link>
+              </div>
+            )}
+          </div>
+
           {isAuthenticated ? (
             <>
-              <Link to="/events" className="mobile-menu-item-text" style={{ position: 'relative', display: 'inline-flex', width: 'fit-content' }} onClick={onClose}>
+              <Link to="/events" className="mobile-menu-item-text mobile-menu-events-link" onClick={onClose}>
                 Eventos
                 {eventCount > 0 && (
                   <span className="mobile-event-badge">

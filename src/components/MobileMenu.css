@@ -116,6 +116,85 @@
   transform: translateX(4px);
 }
 
+.mobile-menu-events-link {
+  position: relative;
+  display: inline-flex;
+  width: fit-content;
+}
+
+/* Mobile Menu Games Accordion */
+.mobile-menu-games-accordion {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.mobile-menu-games-trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.mobile-games-arrow {
+  font-size: 13px;
+  transition: transform 0.25s ease;
+  color: var(--text-muted);
+}
+
+.mobile-games-arrow.open {
+  transform: rotate(180deg);
+  color: var(--accent-primary);
+}
+
+.mobile-menu-games-sublist {
+  display: flex;
+  flex-direction: column;
+  padding: 6px 0 6px 12px;
+  gap: 8px;
+  animation: fadeIn 0.2s ease forwards;
+}
+
+.mobile-menu-subitem-link {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-primary);
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.mobile-menu-subitem-link:active,
+.mobile-menu-subitem-link:hover {
+  border-color: var(--accent-primary);
+  background: rgba(212, 175, 55, 0.08);
+}
+
+.game-subitem-icon {
+  font-size: 20px;
+}
+
+.game-subitem-info {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+}
+
+.game-subitem-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.game-subitem-desc {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
 /* Logout styled differently: red link, no capsules */
 .mobile-menu-logout-text {
   color: var(--danger) !important;
@@ -138,3 +217,4 @@
   from { transform: translateY(-30px); opacity: 0; }
   to { transform: translateY(0); opacity: 1; }
 }
+
