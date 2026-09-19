@@ -474,3 +474,30 @@ export const verifyEmailToken = async (token) => {
   });
   return handleResponse(res);
 };
+
+export const getGuessNoteStatus = async (token) => {
+  const res = await fetch(`${API_BASE}/guess-note/status`, {
+    method: 'GET',
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  return handleResponse(res);
+};
+
+export const finishGuessNoteGame = async (gameData, token) => {
+  const res = await fetch(`${API_BASE}/guess-note/finish`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`
+    },
+    body: JSON.stringify(gameData)
+  });
+  return handleResponse(res);
+};
+
+export const getGuessNoteRanking = async () => {
+  const res = await fetch(`${API_BASE}/guess-note/ranking`, {
+    method: 'GET'
+  });
+  return handleResponse(res);
+};

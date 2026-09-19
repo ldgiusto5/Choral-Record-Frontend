@@ -48,6 +48,12 @@ const ProfileHeader = ({
             >
               Coros Seguidos
             </button>
+            <button
+              className={`btn ${activeTab === 'scores' ? 'btn-accent' : 'btn-ghost'}`}
+              onClick={() => setActiveTab('scores')}
+            >
+              🎵 Puntuaciones
+            </button>
             {profileUser.isOwner && (
               <button
                 className={`btn ${activeTab === 'edit' ? 'btn-accent' : 'btn-ghost'}`}

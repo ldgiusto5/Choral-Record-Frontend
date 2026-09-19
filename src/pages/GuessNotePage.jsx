@@ -4,6 +4,8 @@ import Navbar from '../components/Navbar';
 import OneOctavePiano from '../components/games/OneOctavePiano';
 import OctaveSelectorPiano from '../components/games/OctaveSelectorPiano';
 import { playNote } from '../utils/pianoSoundEngine';
+import { finishGuessNoteGame } from '../api/api';
+import toast from 'react-hot-toast';
 import {
   loadDailyGameState,
   saveDailyGameState,
@@ -17,12 +19,13 @@ import { useAuth } from '../context/AuthContext';
 const MAX_ERRORS = 3;
 
 const GuessNotePage = () => {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, token } = useAuth();
 
   // Load daily state from localStorage
   const [gameState, setGameState] = useState(() => loadDailyGameState());
   const [selectedNote, setSelectedNote] = useState(gameState.selectedNote || null);
   const [selectedOctave, setSelectedOctave] = useState(gameState.selectedOctave || null);
+  const [backendSynced, setBackendSynced] = useState(false);
   const [isPlayingAudio, setIsPlayingAudio] = useState(false);
   const [isPlayingHelpAudio, setIsPlayingHelpAudio] = useState(false);
   const [countdown, setCountdown] = useState(getTimeUntilMidnight());
@@ -225,6 +228,22 @@ const GuessNotePage = () => {
     return Math.max(0, baseNotePoints + octavePoints + perfectPitchBonus - errorsPenalty - helpPenalty);
   };
   const totalScore = calculateTotalScore();
+
+  // Sync game result to backend Supabase database when finished
+  useEffect(() => {
+    if (isCompleted && token && !backendSynced) {
+      setBackendSynced(true);
+      finishGuessNoteGame({ score: totalScore, isPerfectPitch }, token)
+        .then(res => {
+          if (!res.alreadyPlayed && res.pointsAdded > 0) {
+            toast.success(`¡Puntuación guardada en tu perfil! +${res.pointsAdded} Pts. Racha: ${res.streak} días 🔥`);
+          }
+        })
+        .catch(err => {
+          console.error('Error syncing score with backend:', err);
+        });
+    }
+  }, [isCompleted, token, totalScore, isPerfectPitch, backendSynced]);
 
   // Dynamic Status Box (Step + Lives + Penalties) that moves down as game progresses
   const renderStatusCard = () => (

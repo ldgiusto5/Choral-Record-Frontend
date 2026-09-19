@@ -345,6 +345,51 @@ const ProfilePage = () => {
           </section>
         )}
 
+        {/* ── Tab 4: Puntuaciones / Juegos ──────────────────────────── */}
+        {activeTab === 'scores' && (
+          <section className="profile-grid-section">
+            <h2 className="section-title profile-grid-title">
+              {profileUser.isOwner ? 'Mis Puntuaciones & Estadísticas' : `Puntuaciones de ${profileUser.name}`}
+            </h2>
+
+            <div className="profile-scores-grid">
+              <div className="score-stat-card">
+                <span className="score-stat-icon">🎹</span>
+                <span className="score-stat-lbl">Juego: Guess Note</span>
+                <span className="score-stat-val">{profileUser.guess_note_score || 0} Puntos</span>
+                <span className="score-stat-sub">Puntuación Total Acumulada</span>
+              </div>
+
+              <div className="score-stat-card">
+                <span className="score-stat-icon">🔥</span>
+                <span className="score-stat-lbl">Racha Actual</span>
+                <span className="score-stat-val">{profileUser.guess_note_streak || 0} Días</span>
+                <span className="score-stat-sub">Días Consecutivos Jugando</span>
+              </div>
+
+              <div className="score-stat-card">
+                <span className="score-stat-icon">👑</span>
+                <span className="score-stat-lbl">Oído Absoluto Hoy</span>
+                <span className="score-stat-val">
+                  {profileUser.guess_note_perfect_pitch ? '¡Conseguido! 🎉' : 'No conseguido hoy'}
+                </span>
+                <span className="score-stat-sub">Partida de 10 Puntos</span>
+              </div>
+
+              <div className="score-stat-card">
+                <span className="score-stat-icon">📅</span>
+                <span className="score-stat-lbl">Última Partida</span>
+                <span className="score-stat-val">
+                  {profileUser.guess_note_last_date
+                    ? String(profileUser.guess_note_last_date).split('T')[0]
+                    : 'Sin registrar'}
+                </span>
+                <span className="score-stat-sub">Fecha del último juego</span>
+              </div>
+            </div>
+          </section>
+        )}
+
         {/* ── Tab 2: Editar perfil ───────────────────────────────────── */}
         {profileUser.isOwner && activeTab === 'edit' && (
           <ProfileEditForm 
