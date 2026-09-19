@@ -71,6 +71,22 @@ export function getDailySecretNote(dateStr = getTodayDateString()) {
   return getNoteFromMidi(midi);
 }
 
+/**
+ * Generates the deterministic reference help note for today (from any of the 88 piano keys)
+ */
+export function getDailyHelpNote(dateStr = getTodayDateString()) {
+  const hash = hashDateString(dateStr + '_help_v2');
+  
+  // Pick any key deterministically from the 88 piano keys (MIDI 21 to 108)
+  const midi = MIN_MIDI + (hash % TOTAL_PIANO_KEYS);
+
+  const helpNoteObj = getNoteFromMidi(midi);
+  return {
+    ...helpNoteObj,
+    spanishNoteOnly: SPANISH_NOTE_NAMES[helpNoteObj.noteName]
+  };
+}
+
 const STORAGE_KEY = 'choral_guess_note_data_v1';
 
 /**
@@ -92,6 +108,9 @@ export function loadDailyGameState() {
     guessedOctave: null,
     wonNote: false,
     wonOctave: false,
+    wonNote: false,
+    wonOctave: false,
+    usedHelp: false,   // whether user requested reference note hint
     isFinished: false
   };
 
@@ -106,7 +125,10 @@ export function loadDailyGameState() {
       return defaultState;
     }
 
-    return parsed;
+    return {
+      ...defaultState,
+      ...parsed
+    };
   } catch (err) {
     console.error('Error reading GuessNote localStorage:', err);
     return defaultState;
@@ -144,11 +166,44 @@ export function getTimeUntilMidnight() {
 /**
  * Returns dynamic musical victory and defeat phrases depending on performance
  */
-export function getMusicalResultPhrase({ wonNote, wonOctave, errorsCount, dateStr = getTodayDateString() }) {
+export function getMusicalResultPhrase({ wonNote, wonOctave, errorsCount, usedHelp = false, dateStr = getTodayDateString() }) {
   const seed = hashDateString(dateStr + '_phrase');
 
-  // Caso 1: 0 fallos y acierto total (Nota + Octava a la primera)
-  if (wonNote && wonOctave && errorsCount === 0) {
+  // Caso 0A: Si el usuario pidió pista y acertó tanto Nota como Octava
+  if (wonNote && wonOctave && usedHelp) {
+    const helpWinPhrases = [
+      {
+        title: "¡Gran Afinación con Pista!",
+        desc: "¡Excelente sentido armónico! Has sabido utilizar la nota de referencia como los músicos profesionales para orientar tu oído y clavar la nota exacta."
+      },
+      {
+        title: "¡Excelente Oído Comparativo!",
+        desc: "¡Gran destreza musical! Demostraste una fantástica capacidad para comparar frecuencias y dar en el blanco con la nota y la octava."
+      },
+      {
+        title: "¡Dominio Armónico Brillante!",
+        desc: "¡Afinación impecable! Apoyarse en el diapasón de referencia demuestra un gran sentido del tono y una enorme precisión auditiva."
+      }
+    ];
+    const picked = helpWinPhrases[seed % helpWinPhrases.length];
+    return {
+      title: picked.title,
+      subtitle: picked.desc,
+      type: 'help-win'
+    };
+  }
+
+  // Caso 0B: Si el usuario pidió pista y acertó solo la Nota (pero no la octava)
+  if (wonNote && !wonOctave && usedHelp) {
+    return {
+      title: "¡Buena Intuición Melódica!",
+      desc: "La pista de referencia te ayudó a ubicar la nota. ¡Gran trabajo de oído comparativo para identificar el tono!",
+      type: 'partial'
+    };
+  }
+
+  // Caso 1: 0 fallos y acierto total SIN AYUDA -> Oído Absoluto (solamente si NO usó pista)
+  if (wonNote && wonOctave && errorsCount === 0 && !usedHelp) {
     const perfectPhrases = [
       "¡Afinación impecable! Has clavado la nota y su octava al primer intento como los grandes maestros.",
       "¡Ni Mozart en sus mejores días! Oído absoluto digno del primer atril.",
@@ -162,8 +217,8 @@ export function getMusicalResultPhrase({ wonNote, wonOctave, errorsCount, dateSt
     };
   }
 
-  // Caso 2: Acierto total de Nota + Octava (con 1 o 2 fallos previos)
-  if (wonNote && wonOctave && errorsCount > 0) {
+  // Caso 2: Acierto total de Nota + Octava SIN AYUDA (con 1 o 2 fallos previos)
+  if (wonNote && wonOctave && errorsCount > 0 && !usedHelp) {
     const masterPhrases = [
       { title: "¡Excelente Afinación!", desc: "¡Como en un buen ensayo de coro: con paciencia y oído diste con el tono exacto!" },
       { title: "¡Armonía Perfecta!", desc: "¡El coro suena afinado! Has encontrado la nota y conquistado su octava con gran destreza." },
@@ -178,8 +233,8 @@ export function getMusicalResultPhrase({ wonNote, wonOctave, errorsCount, dateSt
     };
   }
 
-  // Caso 3: Acierto de Nota, pero falló la Octava
-  if (wonNote && !wonOctave) {
+  // Caso 3: Acierto de Nota, pero falló la Octava (SIN AYUDA)
+  if (wonNote && !wonOctave && !usedHelp) {
     const notePhrases = [
       { title: "¡Buen Tono!", desc: "¡El diapasón no miente! Identificaste la nota perfecta, aunque resonaba en otra tesitura." },
       { title: "¡Gran Intuición Melódica!", desc: "Has acertado el nombre de la nota sin problema. Solo faltó ubicar su octava en el teclado." },

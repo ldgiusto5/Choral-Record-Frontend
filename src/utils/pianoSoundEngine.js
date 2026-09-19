@@ -66,7 +66,7 @@ function noteNameToMidi(fullName) {
 /**
  * Fallback Web Audio synth with piano-like harmonic decay envelope
  */
-function playFallbackSynth(midi, duration = 2.0) {
+function playFallbackSynth(midi, duration = 2.0, volume = 0.8) {
   const ctx = getAudioContext();
   if (!ctx) return;
 
@@ -80,9 +80,11 @@ function playFallbackSynth(midi, duration = 2.0) {
   osc.type = 'triangle';
   osc.frequency.setValueAtTime(freq, now);
 
-  // Piano ADSR envelope: immediate attack, exponential decay
+  // Scaled peak gain for loud, clear synth fallback
+  const peakGain = Math.min(2.5, Math.max(0.0, volume * 2.5));
+
   gain.gain.setValueAtTime(0, now);
-  gain.gain.linearRampToValueAtTime(0.7, now + 0.015);
+  gain.gain.linearRampToValueAtTime(peakGain, now + 0.015);
   gain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
 
   osc.connect(gain);
@@ -93,9 +95,9 @@ function playFallbackSynth(midi, duration = 2.0) {
 }
 
 /**
- * Plays a single piano note by name (e.g. 'F#4' or 'C2')
+ * Plays a single piano note by name (e.g. 'F#4' or 'C2') with customizable volume (0.0 to 1.0)
  */
-export async function playNote(noteFullName, duration = 2.2) {
+export async function playNote(noteFullName, duration = 2.2, volume = 0.8) {
   try {
     const ctx = getAudioContext();
     if (ctx && ctx.state === 'suspended') {
@@ -104,14 +106,16 @@ export async function playNote(noteFullName, duration = 2.2) {
 
     const piano = await getPianoInstrument();
     if (piano) {
-      piano.play(noteFullName, ctx.currentTime, { duration, gain: 1.0 });
+      // Soundfont gain parameter boosted for louder acoustic resonance (more than double at 100%)
+      const boostedGain = volume * 6.5;
+      piano.play(noteFullName, ctx.currentTime, { duration, gain: boostedGain });
     } else {
       const midi = noteNameToMidi(noteFullName);
-      playFallbackSynth(midi, duration);
+      playFallbackSynth(midi, duration, volume);
     }
   } catch (err) {
     console.warn('Error playing note with soundfont, using fallback synth:', err);
     const midi = noteNameToMidi(noteFullName);
-    playFallbackSynth(midi, duration);
+    playFallbackSynth(midi, duration, volume);
   }
 }

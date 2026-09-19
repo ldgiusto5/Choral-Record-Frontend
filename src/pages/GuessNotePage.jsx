@@ -9,6 +9,7 @@ import {
   saveDailyGameState,
   getTimeUntilMidnight,
   getMusicalResultPhrase,
+  getDailyHelpNote,
   SPANISH_NOTE_NAMES
 } from '../utils/guessNoteUtils';
 import { useAuth } from '../context/AuthContext';
@@ -23,10 +24,24 @@ const GuessNotePage = () => {
   const [selectedNote, setSelectedNote] = useState(gameState.selectedNote || null);
   const [selectedOctave, setSelectedOctave] = useState(gameState.selectedOctave || null);
   const [isPlayingAudio, setIsPlayingAudio] = useState(false);
+  const [isPlayingHelpAudio, setIsPlayingHelpAudio] = useState(false);
   const [countdown, setCountdown] = useState(getTimeUntilMidnight());
   const [messageToast, setMessageToast] = useState('');
 
+  // Volume state persisted in localStorage (default 0.8 / 80%)
+  const [volume, setVolume] = useState(() => {
+    const saved = localStorage.getItem('guess_note_piano_volume');
+    return saved !== null ? parseFloat(saved) : 0.8;
+  });
+  const [prevVolume, setPrevVolume] = useState(0.8);
+
   const secret = gameState.secretNote;
+  const helpNote = getDailyHelpNote(gameState.date);
+
+  // Refs for smooth auto-scrolling
+  const octaveSectionRef = useRef(null);
+  const resultCardRef = useRef(null);
+  const helpCardRef = useRef(null);
 
   // Countdown timer effect
   useEffect(() => {
@@ -41,12 +56,54 @@ const GuessNotePage = () => {
     saveDailyGameState(gameState);
   }, [gameState]);
 
-  // Audio playback handler
+  // Persist volume state
+  useEffect(() => {
+    localStorage.setItem('guess_note_piano_volume', volume.toString());
+  }, [volume]);
+
+  // Auto-scroll when octave phase starts (scroll down so bottom of octave section is visible)
+  useEffect(() => {
+    if (gameState.phase === 'octave') {
+      setTimeout(() => {
+        octaveSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });
+      }, 200);
+    }
+  }, [gameState.phase]);
+
+  // Auto-scroll when game completes (scroll down so bottom of results card is visible)
+  useEffect(() => {
+    if (gameState.isFinished || gameState.phase === 'completed') {
+      setTimeout(() => {
+        resultCardRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });
+      }, 200);
+    }
+  }, [gameState.isFinished, gameState.phase]);
+
+  // Auto-scroll when help is unlocked (scroll down so bottom of help card is visible)
+  useEffect(() => {
+    if (gameState.usedHelp) {
+      setTimeout(() => {
+        helpCardRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });
+      }, 150);
+    }
+  }, [gameState.usedHelp]);
+
+  // Toggle Mute / Unmute
+  const handleToggleMute = () => {
+    if (volume > 0) {
+      setPrevVolume(volume);
+      setVolume(0);
+    } else {
+      setVolume(prevVolume > 0 ? prevVolume : 0.8);
+    }
+  };
+
+  // Audio playback handler for secret note
   const handlePlaySound = async () => {
     if (isPlayingAudio) return;
     setIsPlayingAudio(true);
     try {
-      await playNote(secret.fullName, 2.5);
+      await playNote(secret.fullName, 2.5, volume);
     } catch (err) {
       console.error('Audio playback error:', err);
     } finally {
@@ -54,6 +111,31 @@ const GuessNotePage = () => {
         setIsPlayingAudio(false);
       }, 1500);
     }
+  };
+
+  // Audio playback handler for reference help note
+  const handlePlayHelpSound = async () => {
+    if (isPlayingHelpAudio) return;
+    setIsPlayingHelpAudio(true);
+    try {
+      await playNote(helpNote.fullName, 2.5, volume);
+    } catch (err) {
+      console.error('Help audio playback error:', err);
+    } finally {
+      setTimeout(() => {
+        setIsPlayingHelpAudio(false);
+      }, 1500);
+    }
+  };
+
+  // Direct help activation without modal confirmation
+  const handleActivateHelp = () => {
+    const updated = {
+      ...gameState,
+      usedHelp: true
+    };
+    setGameState(updated);
+    setMessageToast('');
   };
 
   // Phase 1: Confirm Note Guess
@@ -70,7 +152,7 @@ const GuessNotePage = () => {
         phase: 'octave' // Advance to octave phase
       };
       setGameState(updated);
-      setMessageToast(`¡Exacto! La nota es ${selectedNote} (${SPANISH_NOTE_NAMES[selectedNote]}). Ahora adivina la octava.`);
+      setMessageToast(''); // No toast message when note is correct
     } else {
       // Wrong note!
       const newWrongGuesses = [...gameState.wrongGuesses, selectedNote];
@@ -111,17 +193,7 @@ const GuessNotePage = () => {
     };
     setGameState(updated);
 
-    if (wonOctave) {
-      const phrase = getMusicalResultPhrase({
-        wonNote: true,
-        wonOctave: true,
-        errorsCount: gameState.errorsCount,
-        dateStr: gameState.date
-      });
-      setMessageToast(`✨ ¡${phrase.title}! Has acertado la nota y la octava exacta: ${secret.fullName}.`);
-    } else {
-      setMessageToast(`La octava era ${secret.octave} (${secret.fullName}). ¡Buen intento!`);
-    }
+    setMessageToast('');
   };
 
   const isGameActive = !gameState.isFinished;
@@ -131,8 +203,131 @@ const GuessNotePage = () => {
     wonNote: gameState.wonNote,
     wonOctave: gameState.wonOctave,
     errorsCount: gameState.errorsCount,
+    usedHelp: gameState.usedHelp,
     dateStr: gameState.date
   });
+
+  // Score calculation rules:
+  // Note guessed: 6 pts (if won note)
+  // Octave guessed: +1 pt
+  // Per error: -1 pt
+  // Help used: -3 pts
+  const calculateTotalScore = () => {
+    if (!gameState.wonNote) return 0;
+    const baseNotePoints = 6;
+    const octavePoints = gameState.wonOctave ? 1 : 0;
+    const errorsPenalty = gameState.errorsCount * 1;
+    const helpPenalty = gameState.usedHelp ? 3 : 0;
+    return Math.max(0, baseNotePoints + octavePoints - errorsPenalty - helpPenalty);
+  };
+  const totalScore = calculateTotalScore();
+
+  // Dynamic Status Box (Step + Lives + Penalties) that moves down as game progresses
+  const renderStatusCard = () => (
+    <div className="guess-note-status-card">
+      <div className="status-phase-text">
+        {isOctavePhase ? (
+          <>
+            Paso 2: Adivina la Octava <span className="points-green">(+1 Punto)</span>
+          </>
+        ) : isCompleted ? (
+          'Partida Finalizada'
+        ) : (
+          <>
+            Paso 1: Adivina la Nota <span className="points-green">(+6 Puntos)</span>
+          </>
+        )}
+      </div>
+
+      {!isCompleted ? (
+        <div className="status-recuentos-container">
+          {/* Active play: show attempts & help penalty */}
+          <div className="status-recuento-row">
+            <span className="error-dots-label">Intentos:</span>
+            <div className="error-dots-list">
+              {[0, 1, 2].map((idx) => {
+                const hasFailed = idx < gameState.errorsCount;
+                return (
+                  <span
+                    key={idx}
+                    className={`error-dot ${hasFailed ? 'dot-failed' : 'dot-available'}`}
+                    title={hasFailed ? 'Intento fallido' : 'Intento disponible'}
+                  >
+                    {hasFailed ? '🔴' : '⚪'}
+                  </span>
+                );
+              })}
+            </div>
+            <span className="error-counter-text">
+              {gameState.errorsCount} / {MAX_ERRORS}
+            </span>
+            <span className="points-red">(-1 Punto por fallo)</span>
+          </div>
+
+          {gameState.usedHelp && (
+            <div className="status-recuento-row">
+              <span className="status-row-label">💡 Pista solicitada:</span>
+              <span className="points-red">(-3 Puntos)</span>
+            </div>
+          )}
+        </div>
+      ) : (
+        /* Recuento final completo al terminar la partida */
+        <div className="status-recuentos-container">
+          {/* Nota acertada (+6 Puntos en verde) */}
+          {gameState.wonNote && (
+            <div className="status-recuento-row">
+              <span className="status-row-label">Nota acertada:</span>
+              <span className="points-green">(+6 Puntos)</span>
+            </div>
+          )}
+
+          {/* Octava acertada (+1 Punto en verde) */}
+          {gameState.wonOctave && (
+            <div className="status-recuento-row">
+              <span className="status-row-label">Octava acertada:</span>
+              <span className="points-green">(+1 Punto)</span>
+            </div>
+          )}
+
+          {/* Fallos: se muestra solo si hay fallos (1 o 2 fallos: -1 Punto o -2 Puntos) */}
+          {gameState.errorsCount > 0 && (
+            <div className="status-recuento-row">
+              <span className="error-dots-label">Fallos:</span>
+              <div className="error-dots-list">
+                {[0, 1, 2].map((idx) => {
+                  const hasFailed = idx < gameState.errorsCount;
+                  return (
+                    <span
+                      key={idx}
+                      className={`error-dot ${hasFailed ? 'dot-failed' : 'dot-available'}`}
+                      title={hasFailed ? 'Intento fallido' : 'Intento disponible'}
+                    >
+                      {hasFailed ? '🔴' : '⚪'}
+                    </span>
+                  );
+                })}
+              </div>
+              <span className="error-counter-text">
+                {gameState.errorsCount} / {MAX_ERRORS}
+              </span>
+              <span className="points-red">
+                (-{gameState.errorsCount} {gameState.errorsCount === 1 ? 'Punto' : 'Puntos'})
+              </span>
+            </div>
+          )}
+
+          {/* Pista solicitada (-3 Puntos en rojo) */}
+          {gameState.usedHelp && (
+            <div className="status-recuento-row">
+              <span className="status-row-label">💡 Pista solicitada:</span>
+              <span className="points-red">(-3 Puntos)</span>
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
 
   return (
     <>
@@ -143,12 +338,12 @@ const GuessNotePage = () => {
           {/* Header */}
           <div className="guess-note-header">
             <div className="guess-note-badge-daily">
-              <span>📅 Reto Diario</span>
+              <span>Reto Diario:</span>
               <span className="guess-note-date-text">{gameState.date}</span>
             </div>
             <h1 className="guess-note-title">Guess Note 🎵</h1>
             <p className="guess-note-subtitle">
-              Escucha el sonido del piano y averigua qué nota es entre las 88 teclas acústicas.
+              Escucha el sonido del piano.
             </p>
           </div>
 
@@ -173,38 +368,78 @@ const GuessNotePage = () => {
                 </span>
               )}
             </button>
-            <span className="guess-note-sound-hint">
-              Puedes pulsar el botón todas las veces que necesites para escuchar la nota.
-            </span>
+
+            {/* Help Button Trigger */}
+            {!gameState.usedHelp && !isCompleted && (
+              <button
+                type="button"
+                className="btn guess-note-help-trigger-btn"
+                onClick={handleActivateHelp}
+                title="Solicitar pista de afinación"
+              >
+                <span className="help-trigger-icon">💡</span>
+                <span>Pedir Pista <span className="points-red">(-3 Puntos)</span></span>
+              </button>
+            )}
           </div>
 
-          {/* Error Counter (Dots) */}
-          <div className="guess-note-status-row">
-            <div className="error-dots-container">
-              <span className="error-dots-label">Fallos:</span>
-              <div className="error-dots-list">
-                {[0, 1, 2].map((idx) => {
-                  const hasFailed = idx < gameState.errorsCount;
-                  return (
-                    <span
-                      key={idx}
-                      className={`error-dot ${hasFailed ? 'dot-failed' : 'dot-available'}`}
-                      title={hasFailed ? 'Intento fallido' : 'Intento disponible'}
-                    >
-                      {hasFailed ? '🔴' : '⚪'}
-                    </span>
-                  );
-                })}
+          {/* Help Reference Note Card (When activated) */}
+          {gameState.usedHelp && (
+            <div className="guess-note-help-card" ref={helpCardRef}>
+              <div className="help-card-header">
+                <span className="help-card-icon">💡</span>
+                <div className="help-card-titles">
+                  <span className="help-card-title">Pista de Referencia Desbloqueada</span>
+                  <span className="help-card-badge">Pista Activa <span className="points-red">(-3 Puntos)</span></span>
+                </div>
               </div>
-              <span className="error-counter-text">
-                {gameState.errorsCount} / {MAX_ERRORS}
-              </span>
-            </div>
 
-            {/* Current Phase Pill */}
-            <div className="game-phase-pill">
-              {isOctavePhase ? 'Paso 2: Adivina la Octava' : isCompleted ? 'Partida Finalizada' : 'Paso 1: Adivina la Nota'}
+              <div className="help-card-body">
+                <div className="help-note-info">
+                  <span className="help-note-lbl">Nota de afinación:</span>
+                  <span className="help-note-name-badge">
+                    {SPANISH_NOTE_NAMES[helpNote.noteName]} ({helpNote.noteName})
+                  </span>
+                </div>
+
+                <button
+                  type="button"
+                  className={`btn guess-note-help-sound-btn ${isPlayingHelpAudio ? 'is-playing' : ''}`}
+                  onClick={handlePlayHelpSound}
+                  aria-label="Escuchar nota de referencia"
+                  title="Reproducir sonido de la nota de referencia"
+                >
+                  <span className="sound-btn-icon">{isPlayingHelpAudio ? '🔊' : '▶️'}</span>
+                  <span className="sound-btn-text">
+                    {isPlayingHelpAudio ? 'Sonando referencia...' : 'Escuchar Referencia'}
+                  </span>
+                </button>
+              </div>
             </div>
+          )}
+
+          {/* Classic Volume Control Bar (Placed below the help track) */}
+          <div className="guess-note-volume-control" title="Ajustar volumen del piano">
+            <button
+              type="button"
+              className="volume-icon-btn"
+              onClick={handleToggleMute}
+              aria-label="Silenciar o activar volumen"
+              title={volume === 0 ? 'Activar sonido' : 'Silenciar'}
+            >
+              {volume === 0 ? '🔇' : volume < 0.35 ? '🔈' : volume < 0.7 ? '🔉' : '🔊'}
+            </button>
+            <input
+              type="range"
+              className="volume-range-slider"
+              min="0"
+              max="1"
+              step="0.05"
+              value={volume}
+              onChange={(e) => setVolume(parseFloat(e.target.value))}
+              aria-label="Regulador de volumen del piano"
+            />
+            <span className="volume-percentage">{Math.round(volume * 100)}%</span>
           </div>
 
           {/* Feedback Toast Message */}
@@ -216,6 +451,9 @@ const GuessNotePage = () => {
 
           {/* Phase 1: 1-Octave Piano */}
           <div className="guess-note-piano-section">
+            {/* Status Card (Paso 1) */}
+            {!isOctavePhase && !isCompleted && renderStatusCard()}
+
             <OneOctavePiano
               selectedNote={selectedNote}
               onSelectNote={(note) => setSelectedNote(note)}
@@ -242,13 +480,9 @@ const GuessNotePage = () => {
 
           {/* Phase 2: Octave Selector with Full 88-key representation */}
           {(isOctavePhase || (isCompleted && gameState.wonNote)) && (
-            <div className="guess-note-octave-section">
-              <div className="octave-instruction-banner">
-                <span className="banner-icon">🎹</span>
-                <span className="banner-text">
-                  ¡Nota <strong>{secret.noteName}</strong> ({SPANISH_NOTE_NAMES[secret.noteName]}) acertada! Ahora elige la octava en la que resonó (1 solo intento):
-                </span>
-              </div>
+            <div className="guess-note-octave-section" ref={octaveSectionRef}>
+              {/* Status Card (Paso 2) */}
+              {isOctavePhase && !isCompleted && renderStatusCard()}
 
               <OctaveSelectorPiano
                 guessedNoteName={secret.noteName}
@@ -279,20 +513,33 @@ const GuessNotePage = () => {
 
           {/* Game Over / Results Card */}
           {isCompleted && (
-            <div className={`guess-note-result-card ${
-              resultPhrase.type === 'perfect'
-                ? 'card-purple-victory'
-                : resultPhrase.type === 'win'
-                ? 'card-full-win'
-                : resultPhrase.type === 'defeat'
-                ? 'card-defeat'
-                : 'card-partial-win'
-            }`}>
+            <div
+              ref={resultCardRef}
+              className={`guess-note-result-card ${
+                resultPhrase.type === 'perfect'
+                  ? 'card-purple-victory'
+                  : resultPhrase.type === 'help-win'
+                  ? 'card-help-win'
+                  : resultPhrase.type === 'win'
+                  ? 'card-full-win'
+                  : resultPhrase.type === 'defeat'
+                  ? 'card-defeat'
+                  : 'card-partial-win'
+              }`}
+            >
+              {/* Status Card (Game Over / Finished) */}
+              {renderStatusCard()}
               <div className="result-header">
                 {resultPhrase.type === 'perfect' ? (
                   <>
                     <span className="result-trophy">👑 💜 👑</span>
                     <h2 className="result-title text-purple">{resultPhrase.title}</h2>
+                    <p className="result-subtitle">{resultPhrase.subtitle}</p>
+                  </>
+                ) : resultPhrase.type === 'help-win' ? (
+                  <>
+                    <span className="result-trophy">💡 🎶 🎹</span>
+                    <h2 className="result-title text-amber">{resultPhrase.title}</h2>
                     <p className="result-subtitle">{resultPhrase.subtitle}</p>
                   </>
                 ) : resultPhrase.type === 'win' ? (
@@ -314,6 +561,14 @@ const GuessNotePage = () => {
                     <p className="result-subtitle">{resultPhrase.subtitle}</p>
                   </>
                 )}
+              </div>
+
+              {/* Final Score Display */}
+              <div className="result-final-score-box">
+                <span className="final-score-label">Puntuación Final:</span>
+                <span className="final-score-value">
+                  {totalScore} {totalScore === 1 ? 'Punto' : 'Puntos'}
+                </span>
               </div>
 
               {/* Reveal Solution */}
