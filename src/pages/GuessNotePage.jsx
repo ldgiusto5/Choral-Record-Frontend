@@ -207,18 +207,22 @@ const GuessNotePage = () => {
     dateStr: gameState.date
   });
 
+  const isPerfectPitch = gameState.wonNote && gameState.wonOctave && gameState.errorsCount === 0 && !gameState.usedHelp;
+
   // Score calculation rules:
-  // Note guessed: 6 pts (if won note)
+  // Note guessed: 6 pts
   // Octave guessed: +1 pt
+  // Oído Absoluto bonus (0 errors, no help, note & octave won): +3 pts (Total = 10 pts)
   // Per error: -1 pt
   // Help used: -3 pts
   const calculateTotalScore = () => {
     if (!gameState.wonNote) return 0;
     const baseNotePoints = 6;
     const octavePoints = gameState.wonOctave ? 1 : 0;
+    const perfectPitchBonus = isPerfectPitch ? 3 : 0;
     const errorsPenalty = gameState.errorsCount * 1;
     const helpPenalty = gameState.usedHelp ? 3 : 0;
-    return Math.max(0, baseNotePoints + octavePoints - errorsPenalty - helpPenalty);
+    return Math.max(0, baseNotePoints + octavePoints + perfectPitchBonus - errorsPenalty - helpPenalty);
   };
   const totalScore = calculateTotalScore();
 
@@ -287,6 +291,14 @@ const GuessNotePage = () => {
             <div className="status-recuento-row">
               <span className="status-row-label">Octava acertada:</span>
               <span className="points-green">(+1 Punto)</span>
+            </div>
+          )}
+
+          {/* Oído Absoluto (+3 Puntos en morado) */}
+          {isPerfectPitch && (
+            <div className="status-recuento-row">
+              <span className="status-row-label">👑 Oído Absoluto:</span>
+              <span className="points-purple">(+3 Puntos)</span>
             </div>
           )}
 

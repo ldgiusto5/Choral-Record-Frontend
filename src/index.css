@@ -5092,6 +5092,11 @@ img {
   font-weight: 800;
 }
 
+.points-purple {
+  color: #9333ea !important;
+  font-weight: 800;
+}
+
 .points-red {
   color: #dc2626 !important;
   font-weight: 700;
