@@ -109,6 +109,21 @@ const HomePage = () => {
     setDebouncedSearchQuery('');
   };
 
+  // Ordenar coros por popularidad (más seguidores primero)
+  const sortByPopularity = (choirA, choirB) => {
+    const followersA = Number(choirA.followers_count) || 0;
+    const followersB = Number(choirB.followers_count) || 0;
+    if (followersB !== followersA) {
+      return followersB - followersA; // Mayor número de seguidores primero
+    }
+    const membersA = Number(choirA.member_count) || 0;
+    const membersB = Number(choirB.member_count) || 0;
+    if (membersB !== membersA) {
+      return membersB - membersA;
+    }
+    return choirA.name.localeCompare(choirB.name);
+  };
+
   // Filtrar coros localmente
   const filterChoirs = (list) =>
     list.filter(choir =>
@@ -121,8 +136,8 @@ const HomePage = () => {
   const myChoirs = choirs.filter(c => c.membership && c.membership.status === 'accepted');
   const communityChoirs = choirs.filter(c => !c.membership || c.membership.status !== 'accepted');
 
-  const filteredMyChoirs = filterChoirs(myChoirs);
-  const filteredCommunityChoirs = filterChoirs(communityChoirs);
+  const filteredMyChoirs = filterChoirs(myChoirs).sort(sortByPopularity);
+  const filteredCommunityChoirs = filterChoirs(communityChoirs).sort(sortByPopularity);
 
   // Segmentos paginados
   const paginatedMyChoirs = filteredMyChoirs.slice((myPage - 1) * CHOIRS_PER_PAGE, myPage * CHOIRS_PER_PAGE);

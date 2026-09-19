@@ -100,11 +100,12 @@ const Navbar = () => {
         const cleanQuery = isUserOnly ? searchQuery.slice(1) : searchQuery;
         const queryLower = cleanQuery.toLowerCase();
 
-        // 1. Filtrar coros localmente (solo si no empieza con @)
+        // 1. Filtrar y ordenar coros por popularidad (seguidores)
         const matchedChoirs = isUserOnly
           ? []
           : choirs
               .filter(c => c.name.toLowerCase().includes(queryLower) || (c.description && c.description.toLowerCase().includes(queryLower)))
+              .sort((a, b) => (Number(b.followers_count) || 0) - (Number(a.followers_count) || 0))
               .map(c => ({
                 type: 'choir',
                 id: c.id,
