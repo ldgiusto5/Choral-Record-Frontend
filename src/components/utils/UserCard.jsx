@@ -5,7 +5,7 @@ const UserCard = ({ userItem }) => {
   return (
     <Link to={`/profile/${userItem.username || userItem.id}`} className="user-card-link">
       <div className="photo-card user-card">
-        <div className="user-card-avatar">
+        <div className={`user-card-avatar ${userItem?.has_perfect_pitch_reward ? 'has-perfect-pitch-frame' : ''}`}>
           <img
             src={userItem.profile_image_url || `${BACKEND_URL}/assets/default-avatar.png`}
             alt={userItem.name}

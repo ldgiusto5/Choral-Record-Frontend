@@ -11,7 +11,7 @@ const ProfileHeader = ({
     <div className="photo-card profile-header-card">
       {/* Avatar */}
       <div className="profile-avatar-container">
-        <div className="profile-avatar-circle">
+        <div className={`profile-avatar-circle ${profileUser?.has_perfect_pitch_reward ? 'has-perfect-pitch-frame' : ''}`}>
           <img
             src={currentPreview || `${BACKEND_URL}/assets/default-avatar.png`}
             alt={profileUser.name}
@@ -52,7 +52,7 @@ const ProfileHeader = ({
               className={`btn ${activeTab === 'scores' ? 'btn-accent' : 'btn-ghost'}`}
               onClick={() => setActiveTab('scores')}
             >
-              🎵 Puntuaciones
+              Puntuaciones
             </button>
             {profileUser.isOwner && (
               <button

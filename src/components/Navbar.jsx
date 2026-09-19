@@ -364,7 +364,7 @@ const Navbar = () => {
               
               <Link to={`/profile/${user.username || user.id}`} className="user-badge-link">
                 <div className="user-badge">
-                  <div className="user-avatar">
+                  <div className={`user-avatar ${user?.has_perfect_pitch_reward ? 'has-perfect-pitch-frame' : ''}`}>
                     <img 
                       src={user.profile_image_url || `${BACKEND_URL}/assets/default-avatar.png`} 
                       alt={user.name} 

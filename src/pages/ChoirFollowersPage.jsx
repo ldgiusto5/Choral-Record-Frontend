@@ -84,7 +84,7 @@ const ChoirFollowersPage = () => {
                 {followers.map(follower => (
                   <div key={follower.id} className="follower-item">
                     <Link to={`/profile/${follower.username || follower.id}`} className="follower-link">
-                      <div className="follower-avatar">
+                      <div className={`follower-avatar ${follower?.has_perfect_pitch_reward ? 'has-perfect-pitch-frame' : ''}`}>
                         <img 
                           src={follower.profile_image_url || `${BACKEND_URL}/assets/default-avatar.png`} 
                           alt={follower.name} 

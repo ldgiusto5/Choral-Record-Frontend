@@ -14,7 +14,7 @@ const ChoirMembersList = ({ members }) => {
           {members.map(member => (
             <div key={member.user_id} className="choir-member-item">
               <Link to={`/profile/${member.username || member.user_id}`} className="choir-member-link">
-                <div className="choir-member-avatar">
+                <div className={`choir-member-avatar ${member?.has_perfect_pitch_reward ? 'has-perfect-pitch-frame' : ''}`}>
                   <img 
                     src={member.profile_image_url || `${BACKEND_URL}/assets/default-avatar.png`} 
                     alt={member.name} 

@@ -349,42 +349,45 @@ const ProfilePage = () => {
         {activeTab === 'scores' && (
           <section className="profile-grid-section">
             <h2 className="section-title profile-grid-title">
-              {profileUser.isOwner ? 'Mis Puntuaciones & Estadísticas' : `Puntuaciones de ${profileUser.name}`}
+              {profileUser.isOwner ? 'Mis Puntuaciones' : `Puntuaciones de ${profileUser.name}`}
             </h2>
 
-            <div className="profile-scores-grid">
-              <div className="score-stat-card">
-                <span className="score-stat-icon">🎹</span>
-                <span className="score-stat-lbl">Juego: Guess Note</span>
-                <span className="score-stat-val">{profileUser.guess_note_score || 0} Puntos</span>
-                <span className="score-stat-sub">Puntuación Total Acumulada</span>
+            <div className="profile-single-game-card">
+              <div className="game-card-header">
+                <div className="game-card-title-group">
+                  <h3 className="game-card-title">Guess Note 🎵</h3>
+                  <span className="game-card-subtitle">Reto auditivo diario</span>
+                </div>
+                <div className="game-card-total-score">
+                  <span className="total-score-lbl">Puntuación Total Acumulada:</span>
+                  <span className="total-score-num">{profileUser.guess_note_score || 0} Puntos</span>
+                </div>
               </div>
 
-              <div className="score-stat-card">
-                <span className="score-stat-icon">🔥</span>
-                <span className="score-stat-lbl">Racha Actual</span>
-                <span className="score-stat-val">{profileUser.guess_note_streak || 0} Días</span>
-                <span className="score-stat-sub">Días Consecutivos Jugando</span>
-              </div>
+              <div className="game-card-stats-row">
+                <div className="stat-compact-item">
+                  <span className="stat-compact-icon">🔥</span>
+                  <span className="stat-compact-lbl">Racha Actual</span>
+                  <span className="stat-compact-val">{profileUser.guess_note_streak || 0} Días</span>
+                </div>
 
-              <div className="score-stat-card">
-                <span className="score-stat-icon">👑</span>
-                <span className="score-stat-lbl">Oído Absoluto Hoy</span>
-                <span className="score-stat-val">
-                  {profileUser.guess_note_perfect_pitch ? '¡Conseguido! 🎉' : 'No conseguido hoy'}
-                </span>
-                <span className="score-stat-sub">Partida de 10 Puntos</span>
-              </div>
+                <div className="stat-compact-item">
+                  <span className="stat-compact-icon">👑</span>
+                  <span className="stat-compact-lbl">Oído Absoluto Hoy</span>
+                  <span className="stat-compact-val">
+                    {profileUser.guess_note_perfect_pitch ? '¡Conseguido! 🎉' : 'No conseguido hoy'}
+                  </span>
+                </div>
 
-              <div className="score-stat-card">
-                <span className="score-stat-icon">📅</span>
-                <span className="score-stat-lbl">Última Partida</span>
-                <span className="score-stat-val">
-                  {profileUser.guess_note_last_date
-                    ? String(profileUser.guess_note_last_date).split('T')[0]
-                    : 'Sin registrar'}
-                </span>
-                <span className="score-stat-sub">Fecha del último juego</span>
+                <div className="stat-compact-item">
+                  <span className="stat-compact-icon">📅</span>
+                  <span className="stat-compact-lbl">Última Partida</span>
+                  <span className="stat-compact-val">
+                    {profileUser.guess_note_last_date
+                      ? String(profileUser.guess_note_last_date).split('T')[0]
+                      : 'Sin registrar'}
+                  </span>
+                </div>
               </div>
             </div>
           </section>

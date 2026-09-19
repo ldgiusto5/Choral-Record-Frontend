@@ -26,14 +26,16 @@ const MobileMenu = ({
         <div className="mobile-menu-links">
           {isAuthenticated && (
             <Link to={`/profile/${user?.username || user?.id}`} className="mobile-menu-profile-row" onClick={onClose}>
-              <img 
-                src={user?.profile_image_url || `${BACKEND_URL}/assets/default-avatar.png`} 
-                alt={user?.name} 
-                className="mobile-menu-avatar"
-                onError={(e) => {
-                  e.target.src = `${BACKEND_URL}/assets/default-avatar.png`;
-                }}
-              />
+              <div className={`mobile-menu-avatar-wrapper ${user?.has_perfect_pitch_reward ? 'has-perfect-pitch-frame' : ''}`}>
+                <img 
+                  src={user?.profile_image_url || `${BACKEND_URL}/assets/default-avatar.png`} 
+                  alt={user?.name} 
+                  className="mobile-menu-avatar"
+                  onError={(e) => {
+                    e.target.src = `${BACKEND_URL}/assets/default-avatar.png`;
+                  }}
+                />
+              </div>
               <div className="mobile-menu-profile-info">
                 <span className="name">{user?.name}</span>
                 <span className="username">@{user?.username}</span>
